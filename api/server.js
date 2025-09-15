@@ -5,6 +5,7 @@ const express = require('express');
 const rateLimit = require('express-rate-limit');
 const cors = require('cors');
 const { connectDB, getDB } = require('./data/connectDB');
+const router = require('./router/router');
 
 
 // Configuración del servidor

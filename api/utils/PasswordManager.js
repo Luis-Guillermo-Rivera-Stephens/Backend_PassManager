@@ -18,18 +18,18 @@ class PasswordManager {
 
 
     static async EncryptPassword(password) {
-        return bcrypt.hash(password, 10);
+        return await bcrypt.hash(password, 10);
     }
 
     static async ComparePassword(password, hashedPassword) {
-        return bcrypt.compare(password, hashedPassword);
+        return await bcrypt.compare(password, hashedPassword);
     }
 
-    static async HidePassword(password) {
+    static HidePassword(password) {
         return CryptoJS.AES.encrypt(password, AES_KEY).toString();
     }
 
-    static async ShowPassword(password) {
+    static ShowPassword(password) {
         return CryptoJS.AES.decrypt(password, AES_KEY).toString(CryptoJS.enc.Utf8);
     } 
 

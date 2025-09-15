@@ -1,10 +1,10 @@
 class Password {
-    constructor(id, name, password, updateableByClient, visible = true) {
+    constructor(id, name, password, updateableByClient, visibility = true) {
         this.id = id;
         this.name = name;
         this.password = password;
         this.updateableByClient = updateableByClient;
-        this.visible = visible;
+        this.visibility = visibility;
     }
     toJSON() {
         return {
@@ -12,8 +12,7 @@ class Password {
             name: this.name,
             password: this.password,
             updateableByClient: this.updateableByClient,
-            visible: this.visible
+            visibility: this.visibility
         }
     }
-
 }

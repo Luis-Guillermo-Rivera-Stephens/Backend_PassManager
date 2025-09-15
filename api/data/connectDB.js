@@ -1,5 +1,7 @@
 const { Pool } = require('pg');
 const getdbinfo = require('./getdbinfo');
+const fs = require('fs');
+const path = require('path');
 
 class DatabaseConnection {
     constructor() {
@@ -23,15 +25,18 @@ class DatabaseConnection {
             // Obtener la URL de conexión
             const dbUrl = await getdbinfo();
             
+            // Configuración SSL con certificado
+            const sslConfig = this.getSSLConfig();
+            
             // Configuración del pool de conexiones
             const config = {
                 connectionString: dbUrl,
                 max: 20, // máximo 20 conexiones en el pool
                 idleTimeoutMillis: 30000, // cerrar conexiones inactivas después de 30 segundos
                 connectionTimeoutMillis: 10000, // timeout de conexión de 10 segundos
-                ssl: {
-                    rejectUnauthorized: false // Para Supabase
-                }
+                ssl: sslConfig,
+                // Forzar el uso de nuestra configuración SSL
+                application_name: 'PassManager'
             };
 
             // Crear el pool de conexiones
@@ -129,6 +134,52 @@ class DatabaseConnection {
             this.isConnected = false;
             console.log('🔌 Conexión a la base de datos cerrada');
         }
+    }
+
+    getSSLConfig() {
+        const certsDir = path.join(__dirname, '../certificates');
+        
+        // Buscar cualquier archivo .crt en la carpeta certificates
+        let certPath = null;
+        if (fs.existsSync(certsDir)) {
+            const files = fs.readdirSync(certsDir);
+            const certFile = files.find(file => file.endsWith('.crt'));
+            if (certFile) {
+                certPath = path.join(certsDir, certFile);
+            }
+        }
+        
+        // Verificar si el certificado existe
+        if (certPath && fs.existsSync(certPath)) {
+            try {
+                const certContent = fs.readFileSync(certPath, 'utf8');
+                console.log('🔐 Usando certificado SSL de Supabase:', path.basename(certPath));
+                console.log('📄 Tamaño del certificado:', certContent.length, 'caracteres');
+                
+                return {
+                    rejectUnauthorized: false,
+                    ca: certContent,
+                    checkServerIdentity: () => undefined,
+                    secureProtocol: 'TLSv1_2_method',
+                    ciphers: 'ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384'
+                };
+            } catch (error) {
+                console.error('❌ Error al leer el certificado:', error.message);
+                return this.getDefaultSSLConfig();
+            }
+        } else {
+            console.log('⚠️  Certificado SSL no encontrado, usando configuración por defecto');
+            return this.getDefaultSSLConfig();
+        }
+    }
+
+    getDefaultSSLConfig() {
+        return process.env.NODE_ENV === 'production' ? {
+            rejectUnauthorized: true
+        } : {
+            rejectUnauthorized: false,
+            checkServerIdentity: () => undefined // Ignora verificación de identidad del servidor
+        };
     }
 
     getConnectionStatus() {

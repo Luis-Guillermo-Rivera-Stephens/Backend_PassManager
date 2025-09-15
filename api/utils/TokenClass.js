@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 
 const secretKey = process.env.JWT_SECRET_KEY;
 const expiresIn = process.env.JWT_EXPIRES_IN;
+const apiKeyExpiresIn = process.env.JWT_API_KEY_EXPIRES_IN || '365d';
 
 class TokenClass {
     constructor(id, token_type) {
@@ -9,7 +10,18 @@ class TokenClass {
         this.token_type = token_type;
     }
 
+    static FromDecodedInfo(decoded) {
+        if (!decoded.id || !decoded.token_type) {
+            return null;
+        }
+        return new TokenClass(decoded.id, decoded.token_type);
+    }
+
     toToken() {
+        return jwt.sign({ id: this.id, token_type: this.token_type }, secretKey, { expiresIn: expiresIn });
+    }
+
+    toApiKey() {
         return jwt.sign({ id: this.id, token_type: this.token_type }, secretKey, { expiresIn: expiresIn });
     }
 
@@ -20,4 +32,9 @@ class TokenClass {
         return new TokenClass(id, 'verification').toToken();
     }
     
+    static ApiKey(id) {
+        return new TokenClass(id, 'access').toApiKey();
+    }
 }
+
+module.exports = TokenClass;

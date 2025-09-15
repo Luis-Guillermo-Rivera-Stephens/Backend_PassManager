@@ -1,13 +1,18 @@
 const AccountExistsByEmail = require('../queries/AccountExistsByEmail');
 const AccountExistsById = require('../queries/AccountExistsByID');
 const CreateAccount = require('../queries/CreateAccount');
+const VerifyAccount = require('../queries/VerifyAccount');
 
 
 class AccountManager {
     static async accountExistsByEmail(email, db) {
         try {
             const result = await db.query(AccountExistsByEmail, [email]);
-            return result.rows[0];
+            return {
+                success: true,
+                account: result.rows[0],
+                exists: result.rows[0] ? true : false
+            }
         } catch (error) {
             return {
                 error: error.message,
@@ -42,4 +47,28 @@ class AccountManager {
             }
         }
     }
+
+    static async verifyAccount(id, db) {
+        try {
+            await db.query(VerifyAccount, [id]);
+        } catch (error) {
+            return {
+                error: error.message,
+                success: false
+            }
+        }
+    }
+
+    static async deleteAccount(id, db) {
+        try {
+            await db.query(DeleteAccount, [id]);
+        } catch (error) {
+            return {
+                error: error.message,
+                success: false
+            }
+        }
+    }
 }
+
+module.exports = AccountManager;

@@ -23,7 +23,9 @@ class Account {
         }
     }
 
-    static newAccount(name, email, password) {
-        return new Account(uuid.v4(), name, email, password, new Date(), false, false, 'client');
+    static newAccount(name, email, password, type) {
+        return new Account(uuid.v4(), name, email, password, new Date(), false, false, type);
     }
 }
+
+module.exports = Account;

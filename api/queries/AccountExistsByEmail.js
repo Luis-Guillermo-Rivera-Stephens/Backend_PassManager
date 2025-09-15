@@ -1,5 +1,5 @@
 module.exports = `
-    SELECT id, type, verified
+    SELECT *
     FROM accounts 
     WHERE email = $1
 `;

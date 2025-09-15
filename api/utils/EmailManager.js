@@ -2,6 +2,7 @@ class EmailManager {
 
 
     static ValidateEmail(email) { 
+        if (!email) return false;
         let _email = null;
         try {
             _email = trim(email);

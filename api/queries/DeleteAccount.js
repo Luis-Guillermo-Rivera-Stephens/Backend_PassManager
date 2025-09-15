@@ -1,5 +1,4 @@
 module.exports = `
-    SELECT *
-    FROM accounts 
+    DELETE FROM accounts 
     WHERE id = $1
 `;

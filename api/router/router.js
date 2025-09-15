@@ -1,7 +1,29 @@
 const express = require('express');
 const router = express.Router();
 
+//middlewares
+const AccessTokenType = require('../middlewares/AccessTokenType');
+const AccountExistByEmail = require('../middlewares/AccountExistByEmail');
+const AccountExistByID = require('../middlewares/AccountExistByID')
+const AccountExistByURLID = require('../middlewares/AccountExistByURL_ID');
+const AdminValidator = require('../middlewares/AdminValidator');
+const AvailableEmail = require('../middlewares/AvailableEmail');
+const AvailableName = require('../middlewares/AvailableName');
+const PasswordValidator = require('../middlewares/PasswordValidator');
+const VerificationTokenType = require('../middlewares/VerificationTokenType');
+const VerifyToken = require('../middlewares/VerifyToken');
+const VerifyURLToken = require('../middlewares/VerifyURLToken');
+
+
+//handlers
+const CreateAccount = require('../handlers/CreateAccount');
+const EmailVerification = require('../handlers/EmailVerification');
+const Login = require('../handlers/Login');
+const DeleteAccount = require('../handlers/DeleteAccount');
+
+
 router.get('/health', (req, res) => {
+    console.log('Health check: OK, time: ', new Date().toISOString());
     return res.json({
       status: 'OK',
       uptime: process.uptime(),
@@ -9,14 +31,13 @@ router.get('/health', (req, res) => {
     });
   });
 
-  router.post('/account', (req, res) => {
-    const { email, password } = req.body;
-    
-  });
-
+router.post('/account', AccountExistByEmail, Login);
+router.put('/account', VerifyToken, AccountExistByID, AccessTokenType, AdminValidator, AvailableName, AvailableEmail, PasswordValidator, CreateAccount);
+router.get('/verification/:token', VerifyURLToken, AccountExistByID,VerificationTokenType, EmailVerification);
+router.delete('/account', VerifyToken, AccountExistByID, AccessTokenType, AdminValidator, AccountExistByURLID, DeleteAccount);
 
   // Middleware para manejar rutas no encontradas
-router.use('*', (req, res) => {
+router.use((req, res) => {
     return res.status(404).json({
       error: 'Ruta no encontrada',
       path: req.originalUrl,
