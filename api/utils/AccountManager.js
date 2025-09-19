@@ -8,6 +8,7 @@ class AccountManager {
     static async accountExistsByEmail(email, db) {
         try {
             const result = await db.query(AccountExistsByEmail, [email]);
+            console.log('AccountManager: accountExistsByEmail: result', result.rows[0]);
             return {
                 success: true,
                 account: result.rows[0],
@@ -21,10 +22,15 @@ class AccountManager {
         }
     }
 
-    static async accountExistsById(id, db) {
+    static async accountExistsByID(id, db) {
         try {
             const result = await db.query(AccountExistsById, [id]);
-            return result.rows[0];
+            console.log('AccountManager: accountExistsByID: result', result.rows[0]	);
+            return {
+                success: true,
+                account: result.rows[0],
+                exists: result.rows[0] ? true : false
+            }
         } catch (error) {
             return {
                 error: error.message,
@@ -33,14 +39,39 @@ class AccountManager {
         }
     }
 
-    static async createAccount(account, db, emailManager) {
+    static async createAccount(account, db, emailManager, token) {
         try {
+            console.log('🔍 AccountManager: createAccount starting...');
+            
             await db.query("BEGIN");
-            await db.query(CreateAccount, [account.email, account.password, account.createdAt, account.verified, account.type]);
-            await emailManager.sendVerificationEmail(account.email);
+            
+            const params = [account.id, account.name, account.email, account.password, account.created_at, account.verified, account.type];
+            console.log('🔍 AccountManager: query parameters:', params);
+            
+            await db.query(CreateAccount, params);
+            
+            // Intentar enviar el email de verificación
+            const emailResult = await emailManager.sendVerificationEmail(account.email, token);
+            if (!emailResult.success) {
+                console.log('❌ AccountManager: failed to send verification email, rolling back account creation');
+                await db.query("ROLLBACK");
+                return {
+                    error: `Account created but failed to send verification email: ${emailResult.error}`,
+                    success: false
+                };
+            }
+            
             await db.query("COMMIT");
+            
+            console.log('✅ AccountManager: account created successfully');
+            return {
+                success: true,
+                message: 'Account created successfully'
+            };
         } catch (error) {
+            console.log('❌ AccountManager: error creating account:', error);
             await db.query("ROLLBACK");
+            
             return {
                 error: error.message,
                 success: false

@@ -12,7 +12,8 @@ class NameManager {
     static async isAvailableName(name, db) {
         try {
             const result = await db.query(AvaliableName, [name]);
-            return {exists: result.rows[0]};
+            console.log('NameManager: isAvailableName: result', result.rows[0]);
+            return {exists: result.rows[0].exists};
         } catch (error) {
             return {
                 error: error.message,

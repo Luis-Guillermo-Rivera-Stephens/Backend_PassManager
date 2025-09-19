@@ -1,10 +1,10 @@
 const AccountManager = require('../utils/AccountManager');
-const connectDB = require('../data/connectDB');
+const { connectDB } = require('../data/connectDB');
 const EmailManager = require('../utils/EmailManager');
 
 const AvailableEmail = async (req, res, next) => {
     console.log('AvailableEmail: starting...');
-    const { email } = req.body;
+    let { email } = req.body;
     if (!EmailManager.ValidateEmail(email)) {
         console.log('AvailableEmail: invalid email');
         return res.status(400).json({ error: 'Invalid email' });

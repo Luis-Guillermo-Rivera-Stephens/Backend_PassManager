@@ -1,5 +1,5 @@
 const AccountManager = require('../utils/AccountManager');
-const connectDB = require('../data/connectDB');
+const { connectDB } = require('../data/connectDB');
 
 
 const DeleteAccount = async (req, res) => {

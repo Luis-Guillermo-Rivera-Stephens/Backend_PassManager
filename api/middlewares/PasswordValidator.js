@@ -2,7 +2,7 @@ const PasswordManager = require('../utils/PasswordManager');
 
 const PasswordValidator = async (req, res, next) => {
     console.log('PasswordValidator: starting...');
-    const { password } = req.body;
+    let { password } = req.body;
     if (!PasswordManager.ValidateStrongPassword(password)) {
         console.log('PasswordValidator: invalid password');
         return res.status(400).json({ error: 'Invalid password' });

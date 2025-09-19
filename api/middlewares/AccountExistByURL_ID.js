@@ -1,5 +1,5 @@
 const AccountManager = require('../utils/AccountManager');
-const connectDB = require('../data/connectDB');
+const { connectDB } = require('../data/connectDB');
 const {validateUUID} = require('uuid');
 
 const AccountExistByURLID = async (req, res, next) => {

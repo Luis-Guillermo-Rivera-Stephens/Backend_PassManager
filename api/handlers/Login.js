@@ -9,16 +9,18 @@ const Login = async (req, res) => {
         return res.status(401).json({ error: 'Invalid password' });
     }
 
-    let token = null, verified = false;
+    let token = null, verified = false, token_type = null;
     if (!account.verified) {
-        token = TokenClass.VerificationToken(account.id);
+        token = TokenClass.EmailSenderToken(account.id);
+        token_type = 'email_sender';
         verified = false;
     } else {
         token = TokenClass.AccessToken(account.id);
+        token_type = 'access';
         verified = true;
     }
 
-    return res.status(200).json({ access_token: token, verified: verified, message: 'Login successful', account_type: account.type });
+    return res.status(200).json({ token_type: token_type, token: token, verified: verified, message: 'Login successful', account_type: account.type });
 }
 
 module.exports = Login;

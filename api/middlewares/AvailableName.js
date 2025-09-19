@@ -1,9 +1,9 @@
 const NameManager = require('../utils/NameManager');
-const connectDB = require('../data/connectDB');
+const { connectDB } = require('../data/connectDB');
 
 const AvailableName = async (req, res, next) => {
     console.log('AvailableName: starting...');
-    const { name } = req.body;
+    let { name } = req.body;
     let db = null;
     try {
 

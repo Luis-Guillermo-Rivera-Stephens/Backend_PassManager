@@ -34,7 +34,7 @@ router.get('/health', (req, res) => {
 router.post('/account', AccountExistByEmail, Login);
 router.put('/account', VerifyToken, AccountExistByID, AccessTokenType, AdminValidator, AvailableName, AvailableEmail, PasswordValidator, CreateAccount);
 router.get('/verification/:token', VerifyURLToken, AccountExistByID,VerificationTokenType, EmailVerification);
-router.delete('/account', VerifyToken, AccountExistByID, AccessTokenType, AdminValidator, AccountExistByURLID, DeleteAccount);
+router.delete('/account/:id', VerifyToken, AccountExistByID, AccessTokenType, AdminValidator, AccountExistByURLID, DeleteAccount);
 
   // Middleware para manejar rutas no encontradas
 router.use((req, res) => {
