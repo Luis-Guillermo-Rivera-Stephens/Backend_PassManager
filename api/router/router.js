@@ -13,6 +13,9 @@ const PasswordValidator = require('../middlewares/PasswordValidator');
 const VerificationTokenType = require('../middlewares/VerificationTokenType');
 const VerifyToken = require('../middlewares/VerifyToken');
 const VerifyURLToken = require('../middlewares/VerifyURLToken');
+const AccountIsVerified = require('../middlewares/AccountIsVerified');
+const VerifyUpdatePrivileges = require('../middlewares/VerifyUpdatePrivileges');
+const PasswordExistByIDAndClient = require('../middlewares/PasswordExistByIDAndClient');
 
 
 //handlers
@@ -20,6 +23,9 @@ const CreateAccount = require('../handlers/CreateAccount');
 const EmailVerification = require('../handlers/EmailVerification');
 const Login = require('../handlers/Login');
 const DeleteAccount = require('../handlers/DeleteAccount');
+const GetAllPasswordsAsAClient = require('../handlers/GetAllPasswordsAsAClient');
+const GetPasswordByIDAsAClient = require('../handlers/GetPasswordByIDAsAClient');
+
 
 
 router.get('/health', (req, res) => {
@@ -35,6 +41,10 @@ router.post('/account', AccountExistByEmail, Login);
 router.put('/account', VerifyToken, AccountExistByID, AccessTokenType, AdminValidator, AvailableName, AvailableEmail, PasswordValidator, CreateAccount);
 router.get('/verification/:token', VerifyURLToken, AccountExistByID,VerificationTokenType, EmailVerification);
 router.delete('/account/:id', VerifyToken, AccountExistByID, AccessTokenType, AdminValidator, AccountExistByURLID, DeleteAccount);
+
+
+router.get('/p', VerifyToken, AccountExistByID, AccessTokenType,AccountIsVerified, GetAllPasswordsAsAClient);
+router.get('/p/:id', VerifyToken, AccountExistByID, AccessTokenType,AccountIsVerified, PasswordExistByIDAndClient, GetPasswordByIDAsAClient);
 
   // Middleware para manejar rutas no encontradas
 router.use((req, res) => {

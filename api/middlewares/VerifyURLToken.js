@@ -1,5 +1,6 @@
 const TokenClass = require('../utils/TokenClass');
 const TokenManager = require('../utils/TokenManager');
+const ApiKeyManager = require('../utils/ApiKeyManager');
 
 const VerifyURLToken = async (req, res, next) => {
     console.log('VerifyURLToken: starting...');
@@ -8,6 +9,15 @@ const VerifyURLToken = async (req, res, next) => {
         console.log('VerifyURLToken: token is required');
         return res.status(401).json({ error: 'Token is required' });
     }
+
+    let token_id = ApiKeyManager.VerifyApiKey(token);
+    if (token_id) {
+        req.token_id = token_id;
+        req.token_type = "access";
+        next();
+        return;
+    }
+
     const result = TokenManager.VerifyToken(token);
     if (result.error) {
         console.log('VerifyURLToken: error verifying token: ', result.error);

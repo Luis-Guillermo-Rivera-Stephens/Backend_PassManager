@@ -1,12 +1,9 @@
 const TokenClass = require('../utils/TokenClass');
 const TokenManager = require('../utils/TokenManager');
+const ApiKeyManager = require('../utils/ApiKeyManager');
 
 const VerifyToken = async (req, res, next) => {
-    const api_key = process.env.APIKEY_ADMIN;
-
-    
     console.log('🔍 VerifyToken: starting...');
-    console.log('🔍 VerifyToken: api key:', api_key);
     
     const token = req.headers['authorization'];
     console.log('🔍 VerifyToken: raw token from headers:', token);
@@ -16,9 +13,9 @@ const VerifyToken = async (req, res, next) => {
         return res.status(401).json({ error: 'Token is required' });
     }
 
-    if (token === api_key) {
-        console.log('🔍 VerifyToken: api key verified');
-        req.token_id = process.env.APIKEY_ID;
+    let token_id = ApiKeyManager.VerifyApiKey(token);
+    if (token_id) {
+        req.token_id = token_id;
         req.token_type = "access";
         next();
         return;

@@ -16,6 +16,11 @@ class PasswordManager {
         return password.trim();
     }
 
+    static ValidatePasswordValue(password) {
+        password = this.SanitizePassword(password);
+        return password ? true : false;
+    }
+
 
     static async EncryptPassword(password) {
         return await bcrypt.hash(password, 10);

@@ -1,0 +1,32 @@
+const PasswordGetter = require('../utils/PasswordGetter');
+const { connectDB } = require('../data/connectDB');
+
+const PasswordExistByIDAndClient = async (req, res, next) => {
+    console.log('PasswordExistByIDAndClient: starting...');
+    const { id } = req.params;
+    const { account_id } = req.account;
+    let db = null;
+    try {
+        db = await connectDB();
+    }
+    catch (error) {
+        console.log('PasswordExistByIDAndClient: error', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+
+    const result = await PasswordGetter.PasswordExistByIDAndAccountID(id, account_id, db);
+    if (result.error) {
+        console.log('PasswordExistByIDAndClient: error', result.error);
+        return res.status(500).json({ error: result.error });
+    }
+    if (!result.exists) {
+        console.log('PasswordExistByIDAndClient: password does not exist');
+        return res.status(404).json({ error: 'Password does not exist' });
+    }
+    
+    console.log('PasswordExistByIDAndClient: password exists');
+    req.password_metadata = result.data;
+    next();
+}
+
+module.exports = PasswordExistByIDAndClient;
