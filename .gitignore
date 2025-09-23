@@ -2,3 +2,8 @@
 **/*.env
 node_modules
 .vscode
+
+# Certificados SSL - NO subir a repositorio por seguridad
+**/certificates
+
+**/testing
