@@ -33,7 +33,7 @@ const CreateAccount = async (req, res) => {
     
     console.log('CreateAccount: account created successfully');
 
-    res.status(200).json({ token_type: 'email_sender', token: emailSenderToken, message: 'Account created successfully', account_type: account.type, verified: false });
+    res.status(200).json({ token_type: 'email_sender', token: emailSenderToken, message: 'Account created successfully', account_type: account.type, verified: false, twofaenabled: account.twofaenabled });
 }
 
 module.exports = CreateAccount;

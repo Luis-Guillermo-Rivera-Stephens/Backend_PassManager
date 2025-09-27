@@ -30,7 +30,7 @@ const AccountExistByEmail = async (req, res, next) => {
         return res.status(404).json({ error: 'Account does not exist' });
     }
     console.log('AccountExistByEmail: account exists');
-    result.account = new Account(result.account.id, result.account.name, result.account.email, result.account.password, result.account.createdAt, result.account.started, result.account.verified, result.account.type);
+    result.account = new Account(result.account.id, result.account.name, result.account.email, result.account.password, result.account.createdAt, result.account.started, result.account.verified, result.account.type, result.account.twofaenabled);
     req.account = result.account;
     next();
 }

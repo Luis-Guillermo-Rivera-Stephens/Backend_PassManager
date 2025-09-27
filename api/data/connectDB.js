@@ -191,26 +191,109 @@ class DatabaseConnection {
     }
 }
 
-// Patrón Singleton
-let dbInstance = null;
+// Pool de conexiones global
+let globalPool = null;
 
 const connectDB = async () => {
-    if (!dbInstance) {
-        dbInstance = new DatabaseConnection();
+    if (!globalPool) {
+        console.log('🔄 Iniciando pool de conexiones...');
+        
+        // Obtener la URL de conexión
+        const dbUrl = await getdbinfo();
+        
+        // Configuración SSL con certificado
+        const sslConfig = getSSLConfig();
+        
+        // Configuración del pool de conexiones
+        const config = {
+            connectionString: dbUrl,
+            max: 20, // máximo 20 conexiones en el pool
+            idleTimeoutMillis: 30000, // cerrar conexiones inactivas después de 30 segundos
+            connectionTimeoutMillis: 10000, // timeout de conexión de 10 segundos
+            ssl: sslConfig,
+            application_name: 'PassManager'
+        };
+
+        // Crear el pool de conexiones
+        globalPool = new Pool(config);
+
+        // Configurar eventos del pool
+        globalPool.on('connect', () => {
+            console.log('✅ Nueva conexión establecida a la base de datos');
+        });
+
+        globalPool.on('error', (err) => {
+            console.error('❌ Error en el pool de conexiones:', err.message);
+        });
+
+        // Probar la conexión
+        const client = await globalPool.connect();
+        await client.query('SELECT NOW()');
+        client.release();
+
+        console.log('✅ Pool de conexiones establecido correctamente');
     }
-    return await dbInstance.connect();
+    
+    return globalPool;
 };
 
 const getDB = async () => {
-    if (!dbInstance) {
-        console.log('🔄 No hay instancia de DB, intentando conectar...');
+    if (!globalPool) {
+        console.log('🔄 No hay pool de conexiones, intentando conectar...');
         try {
             await connectDB();
         } catch (error) {
             throw new Error(`No se pudo conectar a la base de datos: ${error.message}`);
         }
     }
-    return dbInstance.pool; // Retorna directamente el Pool para usar con ORMs
+    return globalPool;
+};
+
+// Función para obtener configuración SSL (extraída de la clase)
+const getSSLConfig = () => {
+    const certsDir = path.join(__dirname, '../certificates');
+    
+    // Buscar cualquier archivo .crt en la carpeta certificates
+    let certPath = null;
+    if (fs.existsSync(certsDir)) {
+        const files = fs.readdirSync(certsDir);
+        const certFile = files.find(file => file.endsWith('.crt'));
+        if (certFile) {
+            certPath = path.join(certsDir, certFile);
+        }
+    }
+    
+    // Verificar si el certificado existe
+    if (certPath && fs.existsSync(certPath)) {
+        try {
+            const certContent = fs.readFileSync(certPath, 'utf8');
+            console.log('🔐 Usando certificado SSL de Supabase:', path.basename(certPath));
+            console.log('📄 Tamaño del certificado:', certContent.length, 'caracteres');
+            
+            return {
+                rejectUnauthorized: false,
+                ca: certContent,
+                checkServerIdentity: () => undefined,
+                secureProtocol: 'TLSv1_2_method',
+                ciphers: 'ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384'
+            };
+        } catch (error) {
+            console.error('❌ Error al leer el certificado:', error.message);
+            return getDefaultSSLConfig();
+        }
+    } else {
+        console.log('⚠️  Certificado SSL no encontrado, usando configuración por defecto');
+        return getDefaultSSLConfig();
+    }
+};
+
+const getDefaultSSLConfig = () => {
+    return process.env.NODE_ENV === 'production' ? {
+        rejectUnauthorized: true
+    } : {
+        rejectUnauthorized: false,
+        checkServerIdentity: () => undefined // Ignora verificación de identidad del servidor
+    };
 };
 
 module.exports = {

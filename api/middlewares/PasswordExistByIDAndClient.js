@@ -1,10 +1,16 @@
 const PasswordGetter = require('../utils/PasswordGetter');
 const { connectDB } = require('../data/connectDB');
+const { validate } = require('uuid');
 
 const PasswordExistByIDAndClient = async (req, res, next) => {
     console.log('PasswordExistByIDAndClient: starting...');
     const { id } = req.params;
-    const { account_id } = req.account;
+    const { id: account_id } = req.account;
+    if (!validate(id)) {
+        console.log('PasswordExistByIDAndClient: invalid id');
+        return res.status(400).json({ error: 'Invalid id' });
+    }
+
     let db = null;
     try {
         db = await connectDB();
@@ -23,7 +29,7 @@ const PasswordExistByIDAndClient = async (req, res, next) => {
         console.log('PasswordExistByIDAndClient: password does not exist');
         return res.status(404).json({ error: 'Password does not exist' });
     }
-    
+
     console.log('PasswordExistByIDAndClient: password exists');
     req.password_metadata = result.data;
     next();

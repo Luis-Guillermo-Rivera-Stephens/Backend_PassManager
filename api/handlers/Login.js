@@ -20,7 +20,7 @@ const Login = async (req, res) => {
         verified = true;
     }
 
-    return res.status(200).json({ token_type: token_type, token: token, verified: verified, message: 'Login successful', account_type: account.type });
+    return res.status(200).json({ token_type: token_type, token: token, verified: verified, message: 'Login successful', account_type: account.type, twofaenabled: account.twofaenabled });
 }
 
 module.exports = Login;

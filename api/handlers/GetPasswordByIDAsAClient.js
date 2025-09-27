@@ -25,7 +25,6 @@ const GetPasswordByIDAsAClient = async (req, res) => {
         return res.status(404).json({ error: 'No password found' });
     }
 
-
     try {
         let password = PasswordManager.ShowPassword(result.data.password);
         result.data.password = password;

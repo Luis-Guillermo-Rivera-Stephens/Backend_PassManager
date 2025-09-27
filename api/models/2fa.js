@@ -1,17 +1,17 @@
 class TwoFactorAuthentication {
-    constructor(accountId, secret, createdAt = new Date(), isEnabled = false) {
+    constructor(accountId, secret, createdAt = new Date()) {
         this.accountId = accountId;
         this.secret = secret;
         this.createdAt = createdAt;
-        this.isEnabled = isEnabled;
     }
 
     toJSON() {
         return {
             accountId: this.accountId,
             secret: this.secret,
-            createdAt: this.createdAt,
-            isEnabled: this.isEnabled
+            createdAt: this.createdAt
         }
     }
 }
+
+module.exports = TwoFactorAuthentication;

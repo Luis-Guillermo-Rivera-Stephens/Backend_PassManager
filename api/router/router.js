@@ -16,6 +16,8 @@ const VerifyURLToken = require('../middlewares/VerifyURLToken');
 const AccountIsVerified = require('../middlewares/AccountIsVerified');
 const VerifyUpdatePrivileges = require('../middlewares/VerifyUpdatePrivileges');
 const PasswordExistByIDAndClient = require('../middlewares/PasswordExistByIDAndClient');
+const PasswordNameValidator = require('../middlewares/PasswordNameValidator');
+const EmailSenderTokenType = require('../middlewares/EmailSenderTokenType');
 
 
 //handlers
@@ -25,6 +27,10 @@ const Login = require('../handlers/Login');
 const DeleteAccount = require('../handlers/DeleteAccount');
 const GetAllPasswordsAsAClient = require('../handlers/GetAllPasswordsAsAClient');
 const GetPasswordByIDAsAClient = require('../handlers/GetPasswordByIDAsAClient');
+const CreatePasswordAsAClient = require('../handlers/CreatePasswordAsAClient');
+const DeletePasswordAsAClient = require('../handlers/DeletePasswordAsAClient');
+const UpdateAsAClient = require('../handlers/UpdateAsAClient');
+const ResendEmail = require('../handlers/ResendEmail');
 
 
 
@@ -39,12 +45,17 @@ router.get('/health', (req, res) => {
 
 router.post('/account', AccountExistByEmail, Login);
 router.put('/account', VerifyToken, AccountExistByID, AccessTokenType, AdminValidator, AvailableName, AvailableEmail, PasswordValidator, CreateAccount);
-router.get('/verification/:token', VerifyURLToken, AccountExistByID,VerificationTokenType, EmailVerification);
 router.delete('/account/:id', VerifyToken, AccountExistByID, AccessTokenType, AdminValidator, AccountExistByURLID, DeleteAccount);
 
+router.get('/verfication', VerifyToken, AccountExistByID, EmailSenderTokenType, ResendEmail);
+router.get('/verification/:token', VerifyURLToken, AccountExistByID,VerificationTokenType, EmailVerification);
 
-router.get('/p', VerifyToken, AccountExistByID, AccessTokenType,AccountIsVerified, GetAllPasswordsAsAClient);
+router.get('/p',VerifyToken, AccountExistByID , AccessTokenType,AccountIsVerified, GetAllPasswordsAsAClient);
 router.get('/p/:id', VerifyToken, AccountExistByID, AccessTokenType,AccountIsVerified, PasswordExistByIDAndClient, GetPasswordByIDAsAClient);
+router.post('/p', VerifyToken, AccountExistByID, AccessTokenType,AccountIsVerified, PasswordNameValidator, CreatePasswordAsAClient);
+router.put('/p/:attribute/:id', VerifyToken, AccountExistByID, AccessTokenType,AccountIsVerified, PasswordExistByIDAndClient, VerifyUpdatePrivileges, PasswordNameValidator, UpdateAsAClient);
+
+router.delete('/p/:id', VerifyToken, AccountExistByID, AccessTokenType,AccountIsVerified, PasswordExistByIDAndClient, VerifyUpdatePrivileges, DeletePasswordAsAClient);
 
   // Middleware para manejar rutas no encontradas
 router.use((req, res) => {

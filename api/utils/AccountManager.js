@@ -45,7 +45,7 @@ class AccountManager {
             
             await db.query("BEGIN");
             
-            const params = [account.id, account.name, account.email, account.password, account.created_at, account.verified, account.type];
+            const params = [account.id, account.name, account.email, account.password, account.created_at, account.verified, account.type, account.twofaenabled];
             console.log('🔍 AccountManager: query parameters:', params);
             
             await db.query(CreateAccount, params);

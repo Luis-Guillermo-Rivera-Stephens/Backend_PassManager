@@ -1,13 +1,17 @@
 const bcrypt = require('bcrypt');
 const CryptoJS = require('crypto-js');
+const PasswordNameIsAvailable = require('../queries/PasswordNameIsAvailable');
+const CreatePassword = require('../queries/CreatePassword');
+const DeletePassword = require('../queries/DeletePassword');
 
 const AES_KEY = process.env.AES_KEY;
 
 class PasswordManager {
 
     static ValidateStrongPassword(password) {
+        if (!password || typeof password !== 'string') return false;
         password = this.SanitizePassword(password);
-        if (!password) return false;
+        if (password === '') return false;
         const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{16,}$/;
         return regex.test(password);
     }
@@ -16,11 +20,24 @@ class PasswordManager {
         return password.trim();
     }
 
-    static ValidatePasswordValue(password) {
-        password = this.SanitizePassword(password);
-        return password ? true : false;
+    static SanitizeValue(value) {
+        return value.trim();
     }
 
+    static ValidateDescription(description) {
+        if (!description || typeof description !== 'string') return false;
+        description = this.SanitizeValue(description);
+        if (description === '') return false;
+        if (description.length > 500) return false; // Límite de caracteres
+        return true;
+    }
+
+    static ValidatePasswordValue(password) {
+        if (!password || typeof password !== 'string') return false;
+        password = this.SanitizePassword(password);
+        if (password === '') return false;
+        return true;
+    }
 
     static async EncryptPassword(password) {
         return await bcrypt.hash(password, 10);
@@ -38,6 +55,123 @@ class PasswordManager {
         return CryptoJS.AES.decrypt(password, AES_KEY).toString(CryptoJS.enc.Utf8);
     } 
 
+
+    static ValidatePasswordName(name) {
+        if (!name || name.length < 3 || name.length > 100 || typeof name !== 'string') return false;
+        name = this.SanitizePasswordName(name);
+        if (name === '') return false;
+        const regex = /^[a-zA-Z\s@._-]+$/;
+        return regex.test(name);
+    }
+
+    static SanitizePasswordName(name) {
+        return name.trim();
+    }
+
+    static async PasswordNameIsAvailable(name, account_id, db) {
+        try {
+            const result = await db.query(PasswordNameIsAvailable, [name, account_id]);
+            return {
+                exists: result.rows[0].exists,
+                data: result.rows[0],
+                success: true
+            }
+        } catch (error) {
+            return {
+                error: error.message,
+                success: false
+            }
+        }
+    }
+
+    static async createPassword(password, db) {
+        try {
+            const result = await db.query(CreatePassword, [password.id, password.name, password.description, password.password, password.updateablebyclient, password.visibility, password.account_id]);
+            return {
+                data: result.rows[0],
+                success: true
+            }
+        } catch (error) {
+            return {
+                error: error.message,
+                success: false
+            }
+        }
+    }
+
+    static async deletePassword(id, account_id, db) {
+        try {
+            console.log("id", id);
+            console.log("account_id", account_id);
+            const result = await db.query(DeletePassword, [id, account_id]);
+            
+            return {
+                success: true,
+                rows: result.rowCount,
+            }
+        } catch (error) {
+            return {
+                error: error.message,
+                success: false
+            }
+        }
+    }
+
+    static async update(id, attribute, value ,account_id, db) {
+        console.log('PasswordManager.update: starting...');
+        let flag = false;
+        let query = '';
+        switch (attribute) {
+            case 'name':
+                flag = this.ValidatePasswordName(value);
+                query = `UPDATE passwords SET name = $1 WHERE id = $2 AND account_id = $3`;
+                break;
+            case 'description':
+                flag = this.ValidateDescription(value);
+                query = `UPDATE passwords SET description = $1 WHERE id = $2 AND account_id = $3`;
+                break;
+            case 'password':
+                flag = this.ValidatePasswordValue(value);
+                query = `UPDATE passwords SET password = $1 WHERE id = $2 AND account_id = $3`;
+                break;
+            default:
+                return {
+                    error: 'Invalid attribute',
+                    success: false
+                }
+        }
+        if (!flag) {
+            return {
+                error: 'Invalid attribute',
+                success: false
+            }
+        }
+        value = this.SanitizeValue(value);
+
+        if (attribute === 'password') {
+            try {
+                value = this.HidePassword(value);
+            } catch (error) {
+                return {
+                    error: 'Invalid password',
+                    success: false
+                }
+            }
+        }
+
+        try {
+            const result = await db.query(query, [value, id, account_id]);
+            return {
+                success: true,
+                data: result.rows[0],
+            }
+        } catch (error) {
+            return {
+                error: error.message,
+                success: false
+            }
+        }
+    }
 }
 
 module.exports = PasswordManager;

@@ -1,7 +1,7 @@
 const uuid = require('uuid');
 
 class Account {
-    constructor(id = uuid.v4(), name, email, password, created_at = new Date(), started, verified = false, type = 'client') {
+    constructor(id = uuid.v4(), name, email, password, created_at = new Date(), started, verified = false, type = 'client', twofaenabled = false) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -10,6 +10,7 @@ class Account {
         this.started = started;
         this.verified = verified;
         this.type = type;
+        this.twofaenabled = twofaenabled;
     }
 
     toJSON() {
@@ -21,7 +22,8 @@ class Account {
             created_at: this.created_at,
             type: this.type,
             started: this.started,
-            verified: this.verified
+            verified: this.verified,
+            twofaenabled: this.twofaenabled
         }
     }
 
@@ -29,7 +31,7 @@ class Account {
         const now = new Date();
         console.log('🔍 Account: newAccount - created_at:', now);
         console.log('🔍 Account: newAccount - created_at ISO:', now.toISOString());
-        return new Account(uuid.v4(), name, email, password, now, false, false, type);
+        return new Account(uuid.v4(), name, email, password, now, false, false, type, false);
     }
 }
 
