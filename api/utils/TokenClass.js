@@ -52,7 +52,11 @@ class TokenClass {
     static VerificationToken(id) {
         return new TokenClass(id, 'verification').toToken();
     }
-    
+
+    static TwoFactorAuthorizationToken(id) {
+        return new TokenClass(id, 'two_factor_authentication').toToken();
+    }
+
     static ApiKey(id) {
         return new TokenClass(id, 'access').toApiKey();
     }

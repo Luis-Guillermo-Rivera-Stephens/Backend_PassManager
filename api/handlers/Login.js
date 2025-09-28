@@ -15,8 +15,8 @@ const Login = async (req, res) => {
         token_type = 'email_sender';
         verified = false;
     } else {
-        token = TokenClass.AccessToken(account.id);
-        token_type = 'access';
+        token = TokenClass.TwoFactorAuthorizationToken(account.id);
+        token_type = 'two_factor_authentication';
         verified = true;
     }
 

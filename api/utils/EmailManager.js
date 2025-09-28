@@ -72,7 +72,7 @@ class EmailManager {
 
     static ValidateEmail(email) { 
         console.log('ValidateEmail: starting...');
-        if (!email) return false;
+        if (!email || typeof email !== 'string') return false;
         let _email = null;
         try {
             _email = email.trim();

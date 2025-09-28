@@ -1,5 +1,6 @@
 const AccountManager = require('../utils/AccountManager');
 const { connectDB } = require('../data/connectDB');
+const TokenClass = require('../utils/TokenClass');
 
 const EmailVerification = async (req, res) => {
     console.log('EmailVerification: starting...');
@@ -18,7 +19,7 @@ const EmailVerification = async (req, res) => {
     } catch (error) {
         return res.status(500).json({ error: error.message });
     }
-    return res.status(200).json({ message: 'Account verified' });
+    return res.status(200).json({ message: 'Account verified', token_type: 'two_factor_authentication', token: TokenClass.TwoFactorAuthorizationToken(id) });
 
 }
 

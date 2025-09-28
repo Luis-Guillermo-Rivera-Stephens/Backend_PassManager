@@ -1,9 +1,11 @@
 const CryptoJS = require('crypto-js');
 const { authenticator } = require('otplib');
 const QRCode = require('qrcode');
+const TwoFASetup = require('../queries/2FASetup');
+const SecretGetter = require('../queries/SecretGetter');
 
 const AES_KEY = process.env.AES_KEY;
-const ISSUER = process.env.TOTP_ISSUER || 'MyApp'; // nombre que verán los usuarios en el autenticador
+const ISSUER = process.env.TOTP_ISSUER || 'ReservAI PassManager'; // nombre que verán los usuarios en el autenticador
 
 class AuthManager {
     // ========= AES para manejar secretos =========
@@ -15,43 +17,84 @@ class AuthManager {
         return CryptoJS.AES.decrypt(secretEnc, AES_KEY).toString(CryptoJS.enc.Utf8);
     }
 
+    static GenerateSecret() {
+        return authenticator.generateSecret();
+    }
+
     // ========= Generar QR + secreto =========
-    static async GenerateQRCode(email) {
-        if (!email) {
+    static async GenerateQRCode(email, secret) {
+        if (!email || !secret) {
             throw new Error('Email es requerido');
         }
-
-        // Genera secreto base32
-        const secret = authenticator.generateSecret();
 
         // Construye URI estándar (Google/Microsoft Authenticator)
         const otpauth = authenticator.keyuri(email, ISSUER, secret);
 
-        // Genera QR base64
-        const qrDataURL = await QRCode.toDataURL(otpauth);
-
-        // Devuelve el secreto cifrado (guardar en DB)
-        const secretEnc = this.EncryptSecret(secret);
+        // Genera QR base64 con configuración de seguridad
+        const qrDataURL = await QRCode.toDataURL(otpauth, {
+            errorCorrectionLevel: 'M', // Nivel de corrección de errores medio
+            type: 'image/png',
+            quality: 0.92,
+            margin: 1,
+            color: {
+                dark: '#000000',  // QR negro
+                light: '#FFFFFF'  // Fondo blanco
+            }
+        });
 
         return {
             qrDataURL,   // para frontend (<img src="..." />)
             otpauth,     // URI estándar (opcional mostrar en texto)
-            secretEnc    // guardar en base de datos
+            expiresAt: new Date(Date.now() + 10 * 60 * 1000) // Expira en 10 minutos
         };
     }
 
     // ========= Verificar código =========
-    static VerifyCode(secretEnc, code) {
-        if (!secretEnc || !code) {
-            return { success: false, error: 'Secreto o código no proporcionado' };
+    static VerifyCode(secret, code) {
+        if (!secret || !code) {
+            return { 
+                success: false, 
+                error: 'Secreto o código no proporcionado',
+                codeStatus: null // Error técnico
+            };
         }
 
         try {
-            const secret = this.DecryptSecret(secretEnc);
             const isValid = authenticator.check(code, secret);
-            return { success: isValid };
+            return { 
+                success: isValid, 
+                error: isValid ? null : null, // null en ambos casos
+                codeStatus: isValid ? 'valid' : 'invalid' // Estado explícito del código
+            };
         } catch (err) {
-            return { success: false, error: err.message };
+            return { 
+                success: false, 
+                error: err.message,
+                codeStatus: null // Error técnico, no podemos determinar el estado del código
+            };
+        }
+    }
+
+    static async TwoFASetup(account_id, secret, db) {
+        try {
+            await db.query(TwoFASetup, [account_id, secret]);
+            return { success: true, message: 'TwoFA setup successful' };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    }
+    
+    static async SecretGetter(account_id, db) {
+        try {
+            const result = await db.query(SecretGetter, [account_id]);
+            let secret = result.rows[0].secret;
+            if (!secret) {
+                return { success: false, error: 'Secret not found' };
+            }
+            secret = this.DecryptSecret(secret);
+            return { success: true, secret: secret };
+        } catch (error) {
+            return { success: false, error: error.message };
         }
     }
 }

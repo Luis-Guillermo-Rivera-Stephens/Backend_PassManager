@@ -6,6 +6,7 @@ const rateLimit = require('express-rate-limit');
 const cors = require('cors');
 const { connectDB, getDB } = require('./data/connectDB');
 const router = require('./router/router');
+const AttemptsManager = require('./utils/AttemptsManager');
 
 
 // Configuración del servidor
@@ -31,6 +32,9 @@ const corsOptions = {
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 };
+
+// Inicializar AttemptsManager
+AttemptsManager.initialize();
 
 // Middleware
 app.use(cors(corsOptions));

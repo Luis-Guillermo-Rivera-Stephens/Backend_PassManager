@@ -18,7 +18,7 @@ const VerifyUpdatePrivileges = require('../middlewares/VerifyUpdatePrivileges');
 const PasswordExistByIDAndClient = require('../middlewares/PasswordExistByIDAndClient');
 const PasswordNameValidator = require('../middlewares/PasswordNameValidator');
 const EmailSenderTokenType = require('../middlewares/EmailSenderTokenType');
-
+const TwoFATokenType = require('../middlewares/2FATokenType');
 
 //handlers
 const CreateAccount = require('../handlers/CreateAccount');
@@ -31,6 +31,8 @@ const CreatePasswordAsAClient = require('../handlers/CreatePasswordAsAClient');
 const DeletePasswordAsAClient = require('../handlers/DeletePasswordAsAClient');
 const UpdateAsAClient = require('../handlers/UpdateAsAClient');
 const ResendEmail = require('../handlers/ResendEmail');
+const Verify2FACode = require('../handlers/Verify2FACode');
+const TwoFASetup = require('../handlers/TwoFASetup');
 
 
 
@@ -49,6 +51,9 @@ router.delete('/account/:id', VerifyToken, AccountExistByID, AccessTokenType, Ad
 
 router.get('/verfication', VerifyToken, AccountExistByID, EmailSenderTokenType, ResendEmail);
 router.get('/verification/:token', VerifyURLToken, AccountExistByID,VerificationTokenType, EmailVerification);
+
+router.post('/twofa', VerifyToken, AccountExistByID, TwoFATokenType, Verify2FACode);
+router.get('/twofa', VerifyToken, AccountExistByID, TwoFATokenType, TwoFASetup);
 
 router.get('/p',VerifyToken, AccountExistByID , AccessTokenType,AccountIsVerified, GetAllPasswordsAsAClient);
 router.get('/p/:id', VerifyToken, AccountExistByID, AccessTokenType,AccountIsVerified, PasswordExistByIDAndClient, GetPasswordByIDAsAClient);
