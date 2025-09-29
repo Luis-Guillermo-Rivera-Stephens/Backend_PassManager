@@ -1,6 +1,7 @@
 const AccountExistsByEmail = require('../queries/AccountExistsByEmail');
 const AccountExistsById = require('../queries/AccountExistsByID');
 const CreateAccount = require('../queries/CreateAccount');
+const SearchAccounts = require('../queries/SearchAccounts');
 const VerifyAccount = require('../queries/VerifyAccount');
 
 
@@ -93,6 +94,22 @@ class AccountManager {
     static async deleteAccount(id, db) {
         try {
             await db.query(DeleteAccount, [id]);
+        } catch (error) {
+            return {
+                error: error.message,
+                success: false
+            }
+        }
+    }
+
+    static async searchAccounts(search, offset, limit, db) {
+        try {
+            const result = await db.query(SearchAccounts, [search, offset, limit]);
+            return {
+                success: true,
+                accounts: result.rows,
+                count: result.rowCount
+            }
         } catch (error) {
             return {
                 error: error.message,

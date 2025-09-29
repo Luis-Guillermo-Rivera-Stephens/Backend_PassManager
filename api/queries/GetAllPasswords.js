@@ -2,7 +2,6 @@ module.exports = `
     SELECT id, name, description
     FROM passwords
     WHERE account_id = $1 
-    AND visibility = true 
     AND ($4 = '' OR LOWER(name) ILIKE '%' || LOWER($4) || '%')
     OFFSET $2
     LIMIT $3

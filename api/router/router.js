@@ -33,6 +33,8 @@ const UpdateAsAClient = require('../handlers/UpdateAsAClient');
 const ResendEmail = require('../handlers/ResendEmail');
 const Verify2FACode = require('../handlers/Verify2FACode');
 const TwoFASetup = require('../handlers/TwoFASetup');
+const SearchAccounts = require('../handlers/SearchAccounts');
+const SearchAccountInfoByID = require('../handlers/SearchAccountInfoByID');
 
 
 
@@ -47,7 +49,7 @@ router.get('/health', (req, res) => {
 
 router.post('/account', AccountExistByEmail, Login);
 router.put('/account', VerifyToken, AccountExistByID, AccessTokenType, AdminValidator, AvailableName, AvailableEmail, PasswordValidator, CreateAccount);
-router.delete('/account/:id', VerifyToken, AccountExistByID, AccessTokenType, AdminValidator, AccountExistByURLID, DeleteAccount);
+router.delete('/account/:account_id', VerifyToken, AccountExistByID, AccessTokenType, AdminValidator, AccountExistByURLID, DeleteAccount);
 
 router.get('/verfication', VerifyToken, AccountExistByID, EmailSenderTokenType, ResendEmail);
 router.get('/verification/:token', VerifyURLToken, AccountExistByID,VerificationTokenType, EmailVerification);
@@ -59,10 +61,12 @@ router.get('/p',VerifyToken, AccountExistByID , AccessTokenType,AccountIsVerifie
 router.get('/p/:id', VerifyToken, AccountExistByID, AccessTokenType,AccountIsVerified, PasswordExistByIDAndClient, GetPasswordByIDAsAClient);
 router.post('/p', VerifyToken, AccountExistByID, AccessTokenType,AccountIsVerified, PasswordNameValidator, CreatePasswordAsAClient);
 router.put('/p/:attribute/:id', VerifyToken, AccountExistByID, AccessTokenType,AccountIsVerified, PasswordExistByIDAndClient, VerifyUpdatePrivileges, PasswordNameValidator, UpdateAsAClient);
-
 router.delete('/p/:id', VerifyToken, AccountExistByID, AccessTokenType,AccountIsVerified, PasswordExistByIDAndClient, VerifyUpdatePrivileges, DeletePasswordAsAClient);
 
-  // Middleware para manejar rutas no encontradas
+router.get('/a', VerifyToken, AccountExistByID, AccessTokenType, AccountIsVerified, AdminValidator, SearchAccounts);
+router.get('/a/:account_id', VerifyToken, AccountExistByID, AccessTokenType, AccountIsVerified, AdminValidator,AccountExistByURLID, SearchAccountInfoByID);
+
+// Middleware para manejar rutas no encontradas
 router.use((req, res) => {
     return res.status(404).json({
       error: 'Ruta no encontrada',

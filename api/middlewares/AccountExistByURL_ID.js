@@ -1,11 +1,11 @@
 const AccountManager = require('../utils/AccountManager');
 const { connectDB } = require('../data/connectDB');
-const {validateUUID} = require('uuid');
+const {validate} = require('uuid');
 
 const AccountExistByURLID = async (req, res, next) => {
     console.log('AccountExistByURLID: starting...');
-    const id = req.params.id;
-    if (!validateUUID(id)) {
+    const id = req.params.account_id;
+    if (!validate(id)) {
         console.log('AccountExistByURLID: invalid id');
         return res.status(400).json({ error: 'Invalid id' });
     }
@@ -21,7 +21,7 @@ const AccountExistByURLID = async (req, res, next) => {
         return res.status(400).json({ error: 'Account does not exist' });
     }
     console.log('AccountExistByURLID: account exists');
-    req.to_delete = id;
+    req.account_id = id;
     console.log('AccountExistByURLID: account exists');
     next();
 }

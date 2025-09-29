@@ -1,6 +1,5 @@
 const PasswordGetter = require('../utils/PasswordGetter');
 const { connectDB } = require('../data/connectDB');
-const PasswordManager = require('../utils/PasswordManager');
 
 const GetPasswordByIDAsAClient = async (req, res) => {
     console.log('GetPasswordByIDAsAClient: starting...');
@@ -15,7 +14,7 @@ const GetPasswordByIDAsAClient = async (req, res) => {
         return res.status(500).json({ error: 'Internal server error' });
     }
 
-    var result = await PasswordGetter.GetPasswordById_CLIENT(id, account.id, db);
+    var result = await PasswordGetter.GetPasswordById(id, account.id, db, false);
     if (result.error) {
         console.log('GetPasswordByIDAsAClient: error', result.error);
         return res.status(500).json({ error: result.error });

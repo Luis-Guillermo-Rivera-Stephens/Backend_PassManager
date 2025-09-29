@@ -5,10 +5,12 @@ const { connectDB } = require('../data/connectDB');
 const GetAllPasswordsAsAClient = async (req, res) => {
     console.log('GetAllPasswordsAsAClient: starting...');
     const { id } = req.account;
-    let { page } = req.query;
+    let { page, search } = req.query;
     page = page ? parseInt(page) : 1;
     const limit = 10;
 
+    search = search ? search : '';
+    search = search.trim();
 
     let db = null;
     try {
@@ -20,7 +22,7 @@ const GetAllPasswordsAsAClient = async (req, res) => {
     }
 
     const { offset } = PaginationManager.GetPagination(page, limit);
-    const result = await PasswordGetter.GetAllPasswords_CLIENT(id, offset, limit, db);
+    const result = await PasswordGetter.GetAllPasswords(id, false, offset, limit, db, search);
     if (result.error) {
         console.log('GetAllPasswordsAsAClient: error', result.error);
         return res.status(500).json({ error: result.error });

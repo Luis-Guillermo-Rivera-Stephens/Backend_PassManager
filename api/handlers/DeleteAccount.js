@@ -5,7 +5,7 @@ const { connectDB } = require('../data/connectDB');
 const DeleteAccount = async (req, res) => {
     console.log('DeleteAccount: starting...');
 
-    const id = req.to_delete;
+    const id = req.account_id;
     const db = await connectDB();
     
     const result = await AccountManager.deleteAccount(id, db);

@@ -25,7 +25,7 @@ const CreatePasswordAsAClient = async (req, res) => {
     password = PasswordManager.HidePassword(password);
 
     const instance = Password.newPasswordAsAClient(name, description, password, id);
-
+    
     const result = await PasswordManager.createPassword(instance, db);
     if (result.error) {
         console.log('CreatePasswordAsAClient: error', result.error);
