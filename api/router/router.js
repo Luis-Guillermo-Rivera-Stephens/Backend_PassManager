@@ -35,6 +35,7 @@ const Verify2FACode = require('../handlers/Verify2FACode');
 const TwoFASetup = require('../handlers/TwoFASetup');
 const SearchAccounts = require('../handlers/SearchAccounts');
 const SearchAccountInfoByID = require('../handlers/SearchAccountInfoByID');
+const CreatePasswordInAnotherAccount = require('../handlers/CreatePasswordInAnotherAccount');
 
 
 
@@ -65,7 +66,7 @@ router.delete('/p/:id', VerifyToken, AccountExistByID, AccessTokenType,AccountIs
 
 router.get('/a', VerifyToken, AccountExistByID, AccessTokenType, AccountIsVerified, AdminValidator, SearchAccounts);
 router.get('/a/:account_id', VerifyToken, AccountExistByID, AccessTokenType, AccountIsVerified, AdminValidator,AccountExistByURLID, SearchAccountInfoByID);
-
+router.post('/a/:account_id', VerifyToken, AccountExistByID, AccessTokenType, AccountIsVerified, AdminValidator,AccountExistByURLID, PasswordNameValidator, CreatePasswordInAnotherAccount);
 // Middleware para manejar rutas no encontradas
 router.use((req, res) => {
     return res.status(404).json({

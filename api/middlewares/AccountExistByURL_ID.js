@@ -20,8 +20,10 @@ const AccountExistByURLID = async (req, res, next) => {
         console.log('AccountExistByURLID: account does not exist');
         return res.status(400).json({ error: 'Account does not exist' });
     }
+
     console.log('AccountExistByURLID: account exists');
     req.account_id = id;
+    req.account_type = result.account.type;
     console.log('AccountExistByURLID: account exists');
     next();
 }

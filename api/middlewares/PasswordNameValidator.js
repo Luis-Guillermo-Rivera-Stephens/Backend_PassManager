@@ -12,7 +12,7 @@ const PasswordNameValidator = async (req, res, next) => {
     //Este middleware es para validar el nombre del password
     //Si el atributo no es name, se pasa al siguiente middleware
     //pero usamos el mismo endpoint para actualizar todos los atributos
-    if (attribute !== 'name') {
+    if (attribute && attribute !== 'name') {
         console.log('PasswordNameValidator: skipping validation for attribute:', attribute);
         next();
         return;
