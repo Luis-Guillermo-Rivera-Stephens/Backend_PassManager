@@ -55,9 +55,10 @@ const startServer = async () => {
     app.use(router);
 
     // Iniciar servidor
-    app.listen(PORT, () => {
+    app.listen(PORT, '0.0.0.0', () => {
       console.log(`🚀 Servidor PassManager ejecutándose en puerto ${PORT}`);
       console.log(`🌐 URL: http://localhost:${PORT}`);
+      console.log(`🌐 Accesible desde: http://0.0.0.0:${PORT}`);
       console.log(`🌍 CORS Origin: ${process.env.CORS_ORIGIN || '*'}`);
       console.log(`⏰ Iniciado: ${new Date().toISOString()}`);
       console.log(`📋 Rutas disponibles:`);
