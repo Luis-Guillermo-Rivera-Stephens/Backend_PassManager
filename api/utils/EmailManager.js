@@ -108,10 +108,11 @@ class EmailManager {
                 }
             });
 
-            const verificationEndpoint = `${process.env.HOST}/verification/${token}`;
+            let host = process.env.HOST || 'http://localhost:3000';
+            const verificationEndpoint = `${host}/verification/${token}`;
             console.log('✅ EmailManager: verification endpoint:', verificationEndpoint);
             console.log('✅ EmailManager: endpoint length:', verificationEndpoint.length);
-            console.log('✅ EmailManager: HOST env var:', process.env.HOST);
+            console.log('✅ EmailManager: HOST env var:', host);
             console.log('✅ EmailManager: token length:', token.length);
             const htmlTemplate = this.getVerificationEmailTemplate(verificationEndpoint);
 
