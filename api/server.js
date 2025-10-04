@@ -40,6 +40,7 @@ AttemptsManager.initialize();
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.set('trust proxy', 1);
 
 // Aplicar rate limiting a todas las rutas
 app.use(limiter);
