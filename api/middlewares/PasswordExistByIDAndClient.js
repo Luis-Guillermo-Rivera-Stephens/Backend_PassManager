@@ -4,9 +4,9 @@ const { validate } = require('uuid');
 
 const PasswordExistByIDAndClient = async (req, res, next) => {
     console.log('PasswordExistByIDAndClient: starting...');
-    const { id } = req.params;
+    const { pass_id } = req.params;
     const { id: account_id } = req.account;
-    if (!validate(id)) {
+    if (!validate(pass_id)) {
         console.log('PasswordExistByIDAndClient: invalid id');
         return res.status(400).json({ error: 'Invalid id' });
     }
@@ -20,7 +20,7 @@ const PasswordExistByIDAndClient = async (req, res, next) => {
         return res.status(500).json({ error: 'Internal server error' });
     }
 
-    const result = await PasswordGetter.PasswordExistByIDAndAccountID(id, account_id, db);
+    const result = await PasswordGetter.PasswordExistByIDAndAccountID(pass_id, account_id, db);
     if (result.error) {
         console.log('PasswordExistByIDAndClient: error', result.error);
         return res.status(500).json({ error: result.error });

@@ -36,6 +36,7 @@ const TwoFASetup = require('../handlers/TwoFASetup');
 const SearchAccounts = require('../handlers/SearchAccounts');
 const SearchAccountInfoByID = require('../handlers/SearchAccountInfoByID');
 const CreatePasswordInAnotherAccount = require('../handlers/CreatePasswordInAnotherAccount');
+const UpdateAsAnAdmin = require('../handlers/UpdateAsAnAdmin');
 
 
 
@@ -59,14 +60,15 @@ router.post('/twofa', VerifyToken, AccountExistByID, TwoFATokenType, Verify2FACo
 router.get('/twofa', VerifyToken, AccountExistByID, TwoFATokenType, TwoFASetup);
 
 router.get('/p',VerifyToken, AccountExistByID , AccessTokenType,AccountIsVerified, GetAllPasswordsAsAClient);
-router.get('/p/:id', VerifyToken, AccountExistByID, AccessTokenType,AccountIsVerified, PasswordExistByIDAndClient, GetPasswordByIDAsAClient);
+router.get('/p/:pass_id', VerifyToken, AccountExistByID, AccessTokenType,AccountIsVerified, PasswordExistByIDAndClient, GetPasswordByIDAsAClient);
 router.post('/p', VerifyToken, AccountExistByID, AccessTokenType,AccountIsVerified, PasswordNameValidator, CreatePasswordAsAClient);
-router.put('/p/:attribute/:id', VerifyToken, AccountExistByID, AccessTokenType,AccountIsVerified, PasswordExistByIDAndClient, VerifyUpdatePrivileges, PasswordNameValidator, UpdateAsAClient);
-router.delete('/p/:id', VerifyToken, AccountExistByID, AccessTokenType,AccountIsVerified, PasswordExistByIDAndClient, VerifyUpdatePrivileges, DeletePasswordAsAClient);
+router.put('/p/:pass_id', VerifyToken, AccountExistByID, AccessTokenType,AccountIsVerified, PasswordExistByIDAndClient, VerifyUpdatePrivileges, PasswordNameValidator, UpdateAsAClient);
+router.delete('/p/:pass_id', VerifyToken, AccountExistByID, AccessTokenType,AccountIsVerified, PasswordExistByIDAndClient, VerifyUpdatePrivileges, DeletePasswordAsAClient);
 
 router.get('/a', VerifyToken, AccountExistByID, AccessTokenType, AccountIsVerified, AdminValidator, SearchAccounts);
 router.get('/a/:account_id', VerifyToken, AccountExistByID, AccessTokenType, AccountIsVerified, AdminValidator,AccountExistByURLID, SearchAccountInfoByID);
 router.post('/a/:account_id', VerifyToken, AccountExistByID, AccessTokenType, AccountIsVerified, AdminValidator,AccountExistByURLID, PasswordNameValidator, CreatePasswordInAnotherAccount);
+router.put('/a/:account_id/:pass_id', VerifyToken, AccountExistByID, AccessTokenType, AccountIsVerified, AdminValidator,AccountExistByURLID, PasswordNameValidator, UpdateAsAnAdmin);
 // Middleware para manejar rutas no encontradas
 router.use((req, res) => {
     return res.status(404).json({

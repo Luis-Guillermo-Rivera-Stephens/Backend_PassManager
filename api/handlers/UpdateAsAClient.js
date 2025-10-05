@@ -3,11 +3,12 @@ const { connectDB } = require('../data/connectDB');
 
 const UpdateAsAClient = async (req, res) => {
     console.log('UpdateAsAClient: starting...');
-    const { attribute,id } = req.params;
+    const { pass_id } = req.params;
+    const { attribute } = req.query;
     let { value } = req.body;
     const { id: account_id } = req.account;
 
-    if (!['name', 'description', 'password'].includes(attribute)) {
+    if (!['name', 'description', 'password'].includes(attribute) || !attribute) {
         console.log('UpdateAsAClient: invalid attribute');
         return res.status(400).json({ error: 'Invalid attribute' });
     }
@@ -21,7 +22,7 @@ const UpdateAsAClient = async (req, res) => {
         return res.status(500).json({ error: 'Internal server error' });
     }
 
-    const result = await PasswordManager.update(id, attribute, value, account_id, db);
+    const result = await PasswordManager.update(pass_id, attribute, value, account_id, db);
     if (result.error) {
         console.log('UpdateAsAClient: error', result.error);
         return res.status(500).json({ error: result.error });

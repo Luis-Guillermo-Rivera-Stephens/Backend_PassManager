@@ -21,19 +21,18 @@ const TwoFASetup = async (req, res) => {
     let encryptedSecret = null;
     
     try {
-        await db.query("BEGIN");
+
         encryptedSecret = AuthManager.EncryptSecret(secret);
+        qrCode = await AuthManager.GenerateQRCode(req.account.email, secret);
         const result = await AuthManager.TwoFASetup(account_id, encryptedSecret, db);
         if (result.error) {
             console.log('TwoFASetup: error', result.error);
-            await db.query("ROLLBACK");
             return res.status(500).json({ error: result.error });
         }
-        qrCode = await AuthManager.GenerateQRCode(req.account.email, secret);
-        await db.query("COMMIT");
+
     } catch (error) {
         console.log('TwoFASetup: error', error);
-        await db.query("ROLLBACK");
+
         return res.status(500).json({ error: 'Internal server error' });
     }
     

@@ -56,14 +56,15 @@ class TokenClass {
     static TwoFactorAuthorizationToken(id) {
         return new TokenClass(id, 'two_factor_authentication').toToken();
     }
+    
+    static EmailSenderToken(id) {
+        return new TokenClass(id, 'email_sender').toToken();
+    }
 
     static ApiKey(id) {
         return new TokenClass(id, 'access').toApiKey();
     }
 
-    static EmailSenderToken(id) {
-        return new TokenClass(id, 'email_sender').toToken();
-    }
 }
 
 module.exports = TokenClass;

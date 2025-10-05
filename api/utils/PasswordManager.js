@@ -21,6 +21,7 @@ class PasswordManager {
     }
 
     static SanitizeValue(value) {
+        if (typeof value !== 'string') return value;
         return value.trim();
     }
 
@@ -66,6 +67,16 @@ class PasswordManager {
 
     static SanitizePasswordName(name) {
         return name.trim();
+    }
+
+    static ValidateUpdateableByClient(updateablebyclient) {
+        if (updateablebyclient !== true && updateablebyclient !== false) return false;
+        return true;
+    }
+
+    static ValidateVisibility(visibility) {
+        if (visibility !== true && visibility !== false) return false;
+        return true;
     }
 
     static async PasswordNameIsAvailable(name, account_id, db) {
@@ -117,7 +128,7 @@ class PasswordManager {
         }
     }
 
-    static async update(id, attribute, value ,account_id, db) {
+    static async update(pass_id, attribute, value ,account_id, db) {
         console.log('PasswordManager.update: starting...');
         let flag = false;
         let query = '';
@@ -133,6 +144,14 @@ class PasswordManager {
             case 'password':
                 flag = this.ValidatePasswordValue(value);
                 query = `UPDATE passwords SET password = $1 WHERE id = $2 AND account_id = $3`;
+                break;
+            case 'updateablebyclient':
+                flag = this.ValidateUpdateableByClient(value);
+                query = `UPDATE passwords SET updateablebyclient = $1 WHERE id = $2 AND account_id = $3`;
+                break;
+            case 'visibility':
+                flag = this.ValidateVisibility(value);
+                query = `UPDATE passwords SET visibility = $1 WHERE id = $2 AND account_id = $3`;
                 break;
             default:
                 return {
@@ -160,7 +179,7 @@ class PasswordManager {
         }
 
         try {
-            const result = await db.query(query, [value, id, account_id]);
+            const result = await db.query(query, [value, pass_id, account_id]);
             return {
                 success: true,
                 data: result.rows[0],

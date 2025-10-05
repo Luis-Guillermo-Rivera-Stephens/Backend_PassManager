@@ -3,7 +3,7 @@ const { connectDB } = require('../data/connectDB');
 
 const DeletePasswordAsAClient = async (req, res) => {
     console.log('DeletePasswordAsAClient: starting...');
-    const { id } = req.params;
+    const { pass_id } = req.params;
     const { id: account_id } = req.account;
     let db = null;
     try {
@@ -13,7 +13,7 @@ const DeletePasswordAsAClient = async (req, res) => {
         console.log('DeletePasswordAsAClient: error', error);
         return res.status(500).json({ error: 'Internal server error' });
     }
-    const result = await PasswordManager.deletePassword(id, account_id, db);
+    const result = await PasswordManager.deletePassword(pass_id, account_id, db);
     console.log('DeletePasswordAsAClient: result', result);
     if (result.error) {
         console.log('DeletePasswordAsAClient: error', result.error);

@@ -3,7 +3,7 @@ const { connectDB } = require('../data/connectDB');
 
 const GetPasswordByIDAsAClient = async (req, res) => {
     console.log('GetPasswordByIDAsAClient: starting...');
-    const { id } = req.params;
+    const { pass_id } = req.params;
     const account = req.account;
     let db = null;
     try {
@@ -14,7 +14,7 @@ const GetPasswordByIDAsAClient = async (req, res) => {
         return res.status(500).json({ error: 'Internal server error' });
     }
 
-    var result = await PasswordGetter.GetPasswordById(id, account.id, db, false);
+    var result = await PasswordGetter.GetPasswordById(pass_id, account.id, db, false);
     if (result.error) {
         console.log('GetPasswordByIDAsAClient: error', result.error);
         return res.status(500).json({ error: result.error });
