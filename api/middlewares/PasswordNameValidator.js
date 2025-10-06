@@ -7,7 +7,7 @@ const PasswordNameValidator = async (req, res, next) => {
     console.log('PasswordNameValidator: starting...');
     let { name, value } = req.body;
     let {attribute} = req.params;
-    const { account_id } = req.account;
+    const { id: account_id } = req.account;
 
     //Este middleware es para validar el nombre del password
     //Si el atributo no es name, se pasa al siguiente middleware
@@ -21,6 +21,9 @@ const PasswordNameValidator = async (req, res, next) => {
     if (!name && value) {
         name = value;
     }
+
+    console.log('PasswordNameValidator: name', name);
+    console.log('PasswordNameValidator: account_id', account_id);
 
     let db = null;
     try {
