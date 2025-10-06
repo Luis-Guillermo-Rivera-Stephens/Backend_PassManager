@@ -53,7 +53,7 @@ router.post('/account', AccountExistByEmail, Login);
 router.put('/account', VerifyToken, AccountExistByID, AccessTokenType, AdminValidator, AvailableName, AvailableEmail, PasswordValidator, CreateAccount);
 router.delete('/account/:account_id', VerifyToken, AccountExistByID, AccessTokenType, AdminValidator, AccountExistByURLID, DeleteAccount);
 
-router.get('/verfication', VerifyToken, AccountExistByID, EmailSenderTokenType, ResendEmail);
+router.get('/verification', VerifyToken, AccountExistByID, EmailSenderTokenType, ResendEmail);
 router.get('/verification/:token', VerifyURLToken, AccountExistByID,VerificationTokenType, EmailVerification);
 
 router.post('/twofa', VerifyToken, AccountExistByID, TwoFATokenType, Verify2FACode);
