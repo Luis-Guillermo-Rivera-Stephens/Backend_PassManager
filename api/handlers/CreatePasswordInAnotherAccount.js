@@ -4,8 +4,8 @@ const { Password } = require('../models/password');
 
 const CreatePasswordInAnotherAccount = async (req, res) => {
     console.log('CreatePasswordInAnotherAccount: starting...');
-    const {account_id} = req.params;
-    const account_type_url = req.account_type_url;
+    const {id: account_id} = req.account_id_url;
+    const account_type_url = req.account_type_url.type;
     if (account_type_url === 'admin') {
         console.log('CreatePasswordInAnotherAccount: account is an admin');
         return res.status(403).json({ error: 'Account is an admin, you cannot create a password in another admin account' });

@@ -22,8 +22,8 @@ const AccountExistByURLID = async (req, res, next) => {
     }
 
     console.log('AccountExistByURLID: account exists');
-    req.account_id_url = account_id_url;
-    req.account_type_url = result.account.type;
+    req.account_id_url = {id: account_id_url};
+    req.account_type_url = {type: result.account.type};
     console.log('AccountExistByURLID: account exists');
     next();
 }

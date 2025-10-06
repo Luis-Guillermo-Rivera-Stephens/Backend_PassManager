@@ -61,7 +61,7 @@ class PasswordManager {
         if (!name || name.length < 3 || name.length > 100 || typeof name !== 'string') return false;
         name = this.SanitizePasswordName(name);
         if (name === '') return false;
-        const regex = /^[a-zA-Z\s@._-]+$/;
+        const regex = /^[a-zA-Z\s@._\-0-9]+$/;
         return regex.test(name);
     }
 

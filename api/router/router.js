@@ -26,9 +26,9 @@ const EmailVerification = require('../handlers/EmailVerification');
 const Login = require('../handlers/Login');
 const DeleteAccount = require('../handlers/DeleteAccount');
 const GetAllPasswordsAsAClient = require('../handlers/GetAllPasswordsAsAClient');
-const GetPasswordByIDAsAClient = require('../handlers/GetPasswordByIDAsAClient');
+const GetPasswordByID = require('../handlers/GetPasswordByID');
 const CreatePasswordAsAClient = require('../handlers/CreatePasswordAsAClient');
-const DeletePasswordAsAClient = require('../handlers/DeletePasswordAsAClient');
+const DeletePassword = require('../handlers/DeletePassword');
 const UpdateAsAClient = require('../handlers/UpdateAsAClient');
 const ResendEmail = require('../handlers/ResendEmail');
 const Verify2FACode = require('../handlers/Verify2FACode');
@@ -60,15 +60,17 @@ router.post('/twofa', VerifyToken, AccountExistByID, TwoFATokenType, Verify2FACo
 router.get('/twofa', VerifyToken, AccountExistByID, TwoFATokenType, TwoFASetup);
 
 router.get('/p',VerifyToken, AccountExistByID , AccessTokenType,AccountIsVerified, GetAllPasswordsAsAClient);
-router.get('/p/:pass_id', VerifyToken, AccountExistByID, AccessTokenType,AccountIsVerified, PasswordExistByIDAndClient, GetPasswordByIDAsAClient);
+router.get('/p/:pass_id', VerifyToken, AccountExistByID, AccessTokenType,AccountIsVerified, PasswordExistByIDAndClient, GetPasswordByID);
 router.post('/p', VerifyToken, AccountExistByID, AccessTokenType,AccountIsVerified, PasswordNameValidator, CreatePasswordAsAClient);
 router.put('/p/:pass_id', VerifyToken, AccountExistByID, AccessTokenType,AccountIsVerified, PasswordExistByIDAndClient, VerifyUpdatePrivileges, PasswordNameValidator, UpdateAsAClient);
-router.delete('/p/:pass_id', VerifyToken, AccountExistByID, AccessTokenType,AccountIsVerified, PasswordExistByIDAndClient, VerifyUpdatePrivileges, DeletePasswordAsAClient);
+router.delete('/p/:pass_id', VerifyToken, AccountExistByID, AccessTokenType,AccountIsVerified, PasswordExistByIDAndClient, VerifyUpdatePrivileges, DeletePassword);
 
 router.get('/a', VerifyToken, AccountExistByID, AccessTokenType, AccountIsVerified, AdminValidator, SearchAccounts);
 router.get('/a/:account_id', VerifyToken, AccountExistByID, AccessTokenType, AccountIsVerified, AdminValidator,AccountExistByURLID, SearchAccountInfoByID);
+router.get('/a/:account_id/:pass_id', VerifyToken, AccountExistByID, AccessTokenType, AccountIsVerified, AdminValidator,AccountExistByURLID, PasswordExistByIDAndClient,GetPasswordByID);
 router.post('/a/:account_id', VerifyToken, AccountExistByID, AccessTokenType, AccountIsVerified, AdminValidator,AccountExistByURLID, PasswordNameValidator, CreatePasswordInAnotherAccount);
 router.put('/a/:account_id/:pass_id', VerifyToken, AccountExistByID, AccessTokenType, AccountIsVerified, AdminValidator,AccountExistByURLID, PasswordNameValidator, UpdateAsAnAdmin);
+router.delete('/a/:account_id/:pass_id', VerifyToken, AccountExistByID, AccessTokenType, AccountIsVerified, AdminValidator,AccountExistByURLID, PasswordExistByIDAndClient, VerifyUpdatePrivileges, DeletePassword);
 // Middleware para manejar rutas no encontradas
 router.use((req, res) => {
     return res.status(404).json({

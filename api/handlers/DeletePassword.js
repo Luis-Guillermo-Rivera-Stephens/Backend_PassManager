@@ -1,25 +1,25 @@
 const PasswordManager = require('../utils/PasswordManager');
 const { connectDB } = require('../data/connectDB');
 
-const DeletePasswordAsAClient = async (req, res) => {
-    console.log('DeletePasswordAsAClient: starting...');
+const DeletePassword = async (req, res) => {
+    console.log('DeletePassword: starting...');
     const { pass_id } = req.params;
-    const { id: account_id } = req.account;
+    const { id: account_id } = req.account || req.account_id_url;
     let db = null;
     try {
         db = await connectDB();
     }
     catch (error) {
-        console.log('DeletePasswordAsAClient: error', error);
+        console.log('DeletePassword: error', error);
         return res.status(500).json({ error: 'Internal server error' });
     }
     const result = await PasswordManager.deletePassword(pass_id, account_id, db);
-    console.log('DeletePasswordAsAClient: result', result);
+    console.log('DeletePassword: result', result);
     if (result.error) {
-        console.log('DeletePasswordAsAClient: error', result.error);
+        console.log('DeletePassword: error', result.error);
         return res.status(500).json({ error: result.error });
     }
     return res.status(200).json({ message: 'Password deleted' });
 }; 
 
-module.exports = DeletePasswordAsAClient;
+module.exports = DeletePassword;

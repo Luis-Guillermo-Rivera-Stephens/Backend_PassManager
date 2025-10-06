@@ -6,7 +6,7 @@ const UpdateAsAnAdmin = async (req, res) => {
     const { pass_id } = req.params;
     const { attribute } = req.query;
     let { value } = req.body;
-    const account_id_url = req.account_id_url;
+    const account_id_url = req.account_id_url.id;
 
     if (!['name', 'description', 'password', 'updateablebyclient', 'visibility'].includes(attribute) || !attribute) {
         console.log('UpdateAsAnAdmin: invalid attribute');

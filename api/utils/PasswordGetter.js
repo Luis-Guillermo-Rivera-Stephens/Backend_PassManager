@@ -54,6 +54,7 @@ class PasswordGetter {
     }
 
     static async PasswordExistByIDAndAccountID(id, account_id, db) {
+        console.log('PasswordGetter: checking if password exists:', id, account_id);
         try {
             const result = await db.query(PasswordExistByIDAndAccountID, [id, account_id]);
             return {
