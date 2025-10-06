@@ -5,7 +5,11 @@ const PasswordManager = require('../utils/PasswordManager');
 const GetPasswordByID = async (req, res) => {
     console.log('GetPasswordById: starting...');
     const { pass_id } = req.params;
-    const {id: account_id} = req.account_id_url || req.account;
+    if (req.originalUrl.includes('/a/')) {
+        account_id = req.account_id_url.id;
+    } else {
+        account_id = req.account.id;
+    }
     let db = null;
     try {
         db = await connectDB();

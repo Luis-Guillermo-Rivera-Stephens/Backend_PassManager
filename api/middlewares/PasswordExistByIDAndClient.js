@@ -5,10 +5,17 @@ const { validate } = require('uuid');
 const PasswordExistByIDAndClient = async (req, res, next) => {
     console.log('PasswordExistByIDAndClient: starting...');
     const { pass_id } = req.params;
-    const { id: account_id } = req.account_id_url || req.account;
+    let account_id = null;
+    if (req.originalUrl.includes('/a/')) {
+        account_id = req.account_id_url.id;
+    } else {
+        account_id = req.account.id;
+    }
+
+    
     console.log('PasswordExistByIDAndClient: account_id', account_id);
     console.log('PasswordExistByIDAndClient: pass_id', pass_id);
-    if (!validate(pass_id)) {
+    if (!pass_id || !validate(pass_id)) {
         console.log('PasswordExistByIDAndClient: invalid id');
         return res.status(400).json({ error: 'Invalid id' });
     }
