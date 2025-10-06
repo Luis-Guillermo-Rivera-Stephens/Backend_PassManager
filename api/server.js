@@ -1,6 +1,13 @@
 // Cargar variables de entorno
 require('dotenv').config();
 
+// Configurar zona horaria para Guadalajara, Jalisco, México
+const timezone = process.env.TIMEZONE || 'America/Mexico_City';
+process.env.TZ = timezone;
+
+// Configurar zona horaria en Node.js
+const { DateTime } = require('luxon');
+
 const express = require('express');
 const rateLimit = require('express-rate-limit');
 const cors = require('cors');
@@ -57,11 +64,16 @@ const startServer = async () => {
 
     // Iniciar servidor
     app.listen(PORT, '0.0.0.0', () => {
+      const now = new Date();
+      const mexicoTime = DateTime.now().setZone(timezone);
+      
       console.log(`🚀 Servidor PassManager ejecutándose en puerto ${PORT}`);
       console.log(`🌐 URL: http://localhost:${PORT}`);
       console.log(`🌐 Accesible desde: http://0.0.0.0:${PORT}`);
       console.log(`🌍 CORS Origin: ${process.env.CORS_ORIGIN || '*'}`);
-      console.log(`⏰ Iniciado: ${new Date().toISOString()}`);
+      console.log(`⏰ Zona horaria: ${timezone}`);
+      console.log(`📅 Fecha y hora UTC: ${now.toISOString()}`);
+      console.log(`🕐 Hora México (Guadalajara): ${mexicoTime.toFormat('yyyy-MM-dd HH:mm:ss')} ${mexicoTime.offsetNameShort}`);
       console.log(`📋 Rutas disponibles:`);
       console.log(`   - GET / (información del servidor)`);
       console.log(`   - GET /health (estado del servidor)`);

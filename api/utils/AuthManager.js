@@ -1,11 +1,23 @@
 const CryptoJS = require('crypto-js');
 const { authenticator } = require('otplib');
 const QRCode = require('qrcode');
+const { DateTime } = require('luxon');
 const TwoFASetup = require('../queries/2FASetup');
 const SecretGetter = require('../queries/SecretGetter');
 
 const AES_KEY = process.env.AES_KEY;
 const ISSUER = process.env.TOTP_ISSUER || 'ReservAI PassManager'; // nombre que verán los usuarios en el autenticador
+
+// Configuración específica para TOTP (usar UTC estándar)
+authenticator.options = {
+    window: 2, // tolerancia de ±2 ventanas (60 segundos)
+    step: 30,  // intervalo de 30 segundos
+    digits: 6, // 6 dígitos
+    algorithm: 'sha1' // algoritmo de hash
+};
+
+// Configurar zona horaria para México en el autenticador
+// No modificar Date.now globalmente, usar tiempo UTC estándar
 
 class AuthManager {
     // ========= AES para manejar secretos =========
@@ -20,6 +32,12 @@ class AuthManager {
     static GenerateSecret() {
         return authenticator.generateSecret();
     }
+
+    static ValidateCodeFormat(code) {
+        const codeRegex = /^\d{6}$/; // 6 dígitos
+        return codeRegex.test(code);
+    }
+
 
     // ========= Generar QR + secreto =========
     static async GenerateQRCode(email, secret) {
@@ -63,14 +81,14 @@ class AuthManager {
             const isValid = authenticator.check(code, secret);
             return { 
                 success: isValid, 
-                error: isValid ? null : null, // null en ambos casos
-                codeStatus: isValid ? 'valid' : 'invalid' // Estado explícito del código
+                error: isValid ? null : 'Código 2FA inválido',
+                codeStatus: isValid ? 'valid' : 'invalid'
             };
         } catch (err) {
             return { 
                 success: false, 
                 error: err.message,
-                codeStatus: null // Error técnico, no podemos determinar el estado del código
+                codeStatus: null
             };
         }
     }
