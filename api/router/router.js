@@ -38,7 +38,15 @@ const SearchAccountInfoByID = require('../handlers/SearchAccountInfoByID');
 const CreatePasswordInAnotherAccount = require('../handlers/CreatePasswordInAnotherAccount');
 const UpdateAsAnAdmin = require('../handlers/UpdateAsAnAdmin');
 
-
+// Middleware para manejar rutas con y sin prefijo /api
+router.use((req, res, next) => {
+    // Si la ruta viene con /api, la removemos para procesamiento interno
+    if (req.path.startsWith('/api')) {
+        req.url = req.url.replace('/api', '');
+        req.originalUrl = req.originalUrl.replace('/api', '');
+    }
+    next();
+});
 
 router.get('/health', (req, res) => {
     console.log('Health check: OK, time: ', new Date().toISOString());

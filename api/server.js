@@ -60,7 +60,9 @@ const startServer = async () => {
     await connectDB();
     console.log('✅ Base de datos conectada exitosamente');
 
-    app.use(router);
+    // Configurar rutas para que funcionen con y sin prefijo /api
+    app.use(router); // Rutas sin prefijo: /health, /account, etc.
+    app.use('/api', router); // Rutas con prefijo: /api/health, /api/account, etc.
 
     // Iniciar servidor
     app.listen(PORT, '0.0.0.0', () => {
