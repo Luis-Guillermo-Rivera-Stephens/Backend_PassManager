@@ -32,7 +32,7 @@ const GetAllPasswordsAsAClient = async (req, res) => {
         return res.status(404).json({ error: 'No passwords found' });
     }
     result.data = result.data.slice(0, limit);
-    return res.status(200).json({ data: result.data, total: result.total, message: 'Passwords fetched successfully', next_page: result.total = 11 ? page + 1 : null, current_page: page });
+    return res.status(200).json({ data: result.data, total: result.total - 1, message: 'Passwords fetched successfully', next_page: result.total = 11 ? page + 1 : null, current_page: page });
 }
 
 module.exports = GetAllPasswordsAsAClient;
