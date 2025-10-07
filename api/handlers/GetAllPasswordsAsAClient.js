@@ -31,8 +31,13 @@ const GetAllPasswordsAsAClient = async (req, res) => {
         console.log('GetAllPasswordsAsAClient: no passwords found');
         return res.status(404).json({ error: 'No passwords found' });
     }
-    result.data = result.data.slice(0, limit);
-    return res.status(200).json({ data: result.data, total: result.total - 1, message: 'Passwords fetched successfully', next_page: result.total = 11 ? page + 1 : null, current_page: page });
+
+    let total = result.total == 11 ? 10 : result.total;
+    let next_page = result.total == 11 ? page + 1 : null;
+    if (result.total == 11) {
+        result.data = result.data.slice(0, limit);
+    }
+    return res.status(200).json({ data: result.data, total: total, message: 'Passwords fetched successfully', next_page: next_page, current_page: page });
 }
 
 module.exports = GetAllPasswordsAsAClient;
