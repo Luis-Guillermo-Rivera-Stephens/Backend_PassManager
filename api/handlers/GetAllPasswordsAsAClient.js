@@ -22,7 +22,7 @@ const GetAllPasswordsAsAClient = async (req, res) => {
     }
 
     const { offset } = PaginationManager.GetPagination(page, limit);
-    const result = await PasswordGetter.GetAllPasswords(id, false, offset, limit, db, search);
+    const result = await PasswordGetter.GetAllPasswords(id, false, offset, limit + 1, db, search);
     if (result.error) {
         console.log('GetAllPasswordsAsAClient: error', result.error);
         return res.status(500).json({ error: result.error });
@@ -31,7 +31,8 @@ const GetAllPasswordsAsAClient = async (req, res) => {
         console.log('GetAllPasswordsAsAClient: no passwords found');
         return res.status(404).json({ error: 'No passwords found' });
     }
-    return res.status(200).json({ data: result.data, total: result.total, message: 'Passwords fetched successfully', next_page: result.total > (page * limit) ? page + 1 : null, current_page: page });
+    result.data = result.data.slice(0, limit);
+    return res.status(200).json({ data: result.data, total: result.total, message: 'Passwords fetched successfully', next_page: result.total = 11 ? page + 1 : null, current_page: page });
 }
 
 module.exports = GetAllPasswordsAsAClient;
