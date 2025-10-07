@@ -28,8 +28,7 @@ const Verify2FACode = async (req, res) => {
         console.log('Verify2FACode: error', result_secret.error);
         return res.status(500).json({ error: result_secret.error });
     }
-    console.log('Verify2FACode: secret', result_secret.secret);
-    console.log('Verify2FACode: code', code);
+    // Secret and code validation in progress
     
     const result_verify = AuthManager.VerifyCode(result_secret.secret, code);
     console.log('Verify2FACode: result_verify', result_verify);

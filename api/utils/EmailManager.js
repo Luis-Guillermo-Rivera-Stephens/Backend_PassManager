@@ -110,10 +110,7 @@ class EmailManager {
 
             let host = process.env.HOST || 'http://localhost:3000';
             const verificationEndpoint = `${host}/verification/${token}`;
-            console.log('✅ EmailManager: verification endpoint:', verificationEndpoint);
-            console.log('✅ EmailManager: endpoint length:', verificationEndpoint.length);
-            console.log('✅ EmailManager: HOST env var:', host);
-            console.log('✅ EmailManager: token length:', token.length);
+            console.log('✅ EmailManager: sending verification email to:', email);
             const htmlTemplate = this.getVerificationEmailTemplate(verificationEndpoint);
 
             const mailOptions = {

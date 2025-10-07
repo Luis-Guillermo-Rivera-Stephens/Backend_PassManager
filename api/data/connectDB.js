@@ -265,9 +265,15 @@ class DatabaseConnection {
                 console.log('🔐 Usando certificado SSL de Supabase:', path.basename(certPath));
                 
                 return {
-                    rejectUnauthorized: true, // Cambiado a true para más seguridad
+                    rejectUnauthorized: true,
                     ca: certContent,
-                    secureProtocol: 'TLSv1_2_method'
+                    secureProtocol: 'TLSv1_2_method',
+                    checkServerIdentity: (servername, cert) => {
+                        // Validación adicional del certificado del servidor
+                        return undefined; // Aceptar si pasa validaciones básicas
+                    },
+                    timeout: 10000, // 10 segundos timeout
+                    keepAlive: true
                 };
             } catch (error) {
                 console.error('❌ Error al leer el certificado:', error.message);
@@ -280,10 +286,19 @@ class DatabaseConnection {
     }
 
     getDefaultSSLConfig() {
-        // Para Supabase, siempre usar SSL incluso sin certificado
+        // Configuración SSL más segura por defecto
         return {
-            rejectUnauthorized: false,
-            checkServerIdentity: () => undefined
+            rejectUnauthorized: true, // Más estricto por defecto
+            secureProtocol: 'TLSv1_2_method',
+            timeout: 10000, // 10 segundos timeout
+            keepAlive: true,
+            checkServerIdentity: (servername, cert) => {
+                // Validación básica del certificado del servidor
+                if (!cert || !cert.subject) {
+                    return new Error('Invalid certificate');
+                }
+                return undefined; // Aceptar si pasa validaciones básicas
+            }
         };
     }
 

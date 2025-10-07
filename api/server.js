@@ -11,46 +11,80 @@ const { DateTime } = require('luxon');
 const express = require('express');
 const rateLimit = require('express-rate-limit');
 const cors = require('cors');
+const helmet = require('helmet');
 const { connectDB, getDB } = require('./data/connectDB');
 const router = require('./router/router');
 const AttemptsManager = require('./utils/AttemptsManager');
+const SQLInjectionDetector = require('./middlewares/SQLInjectionDetector');
 
 
 // Configuración del servidor
 const app = express();
 const PORT = process.argv[2] || process.env.PORT || 3000;
 
-// Configuración del rate limiting
+// Configuración del rate limiting - MÁS ESTRICTO
 const limiter = rateLimit({
-  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutos por defecto
-  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100, // máximo 100 requests por IP por defecto
+  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutos
+  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 20, // máximo 20 requests por IP (reducido de 100)
   message: {
     error: 'Demasiadas solicitudes desde esta IP, intenta de nuevo más tarde.',
     retryAfter: '15 minutos'
   },
   standardHeaders: true, // Retorna rate limit info en headers `RateLimit-*`
   legacyHeaders: false, // Deshabilita headers `X-RateLimit-*`
+  skipSuccessfulRequests: false, // Contar todas las requests
+  skipFailedRequests: false, // Contar requests fallidas también
 });
 
-// Configuración de CORS
+// Configuración de CORS - MÁS ESPECÍFICO
 const corsOptions = {
-  origin: process.env.CORS_ORIGIN || '*',
-  credentials: process.env.CORS_CREDENTIALS === 'true' || false,
+  origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : ['http://localhost:3000', 'http://localhost:3001'],
+  credentials: process.env.CORS_CREDENTIALS === 'true' || true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  optionsSuccessStatus: 200
+};
+
+// Configuración de Helmet para headers de seguridad
+const helmetOptions = {
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'"],
+      fontSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      mediaSrc: ["'self'"],
+      frameSrc: ["'none'"],
+    },
+  },
+  hsts: {
+    maxAge: 31536000,
+    includeSubDomains: true,
+    preload: true
+  },
+  noSniff: true,
+  xssFilter: true,
+  referrerPolicy: { policy: "same-origin" }
 };
 
 // Inicializar AttemptsManager
 AttemptsManager.initialize();
 
-// Middleware
+// Middleware de seguridad
+app.use(helmet(helmetOptions));
 app.use(cors(corsOptions));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' })); // Límite de tamaño para prevenir DoS
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.set('trust proxy', 1);
 
 // Aplicar rate limiting a todas las rutas
 app.use(limiter);
+
+// Detector de inyección SQL - DEBE ir después de express.json()
+app.use(SQLInjectionDetector.middleware());
 
 // Inicializar servidor y base de datos
 const startServer = async () => {

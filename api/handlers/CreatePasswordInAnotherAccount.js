@@ -15,7 +15,7 @@ const CreatePasswordInAnotherAccount = async (req, res) => {
     updateablebyclient = updateablebyclient || true;
     visibility = visibility || true;
     
-    console.log('CreatePasswordInAnotherAccount: name, password, account_id', name, password, account_id);
+    console.log('CreatePasswordInAnotherAccount: creating password for account_id:', account_id);
     if (!name || !password || !account_id) {
         console.log('CreatePasswordInAnotherAccount: invalid name, password or account_id');
         return res.status(400).json({ error: 'Invalid name, password or account_id' });

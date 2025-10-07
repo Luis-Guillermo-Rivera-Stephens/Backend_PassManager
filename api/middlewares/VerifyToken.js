@@ -3,13 +3,9 @@ const TokenManager = require('../utils/TokenManager');
 const ApiKeyManager = require('../utils/ApiKeyManager');
 
 const VerifyToken = async (req, res, next) => {
-    console.log('🔍 VerifyToken: starting...');
-    
     const token = req.headers['authorization'];
-    console.log('🔍 VerifyToken: raw token from headers:', token);
     
     if (!token || typeof token !== 'string') {
-        console.log('❌ VerifyToken: token is required or invalid type');
         return res.status(401).json({ error: 'Token is required' });
     }
 
@@ -21,39 +17,22 @@ const VerifyToken = async (req, res, next) => {
         return;
     }
     
-    console.log('🔍 VerifyToken: calling TokenManager.VerifyToken...');
     const result = TokenManager.VerifyToken(token);
-    console.log('🔍 VerifyToken: result from TokenManager:', JSON.stringify(result, null, 2));
     
     if (result.error) {
-        console.log('❌ VerifyToken: error verifying token:', result.error);
+        console.error('❌ VerifyToken: Token verification failed:', result.error);
         return res.status(401).json({ error: result.error });
     }
     
-    console.log('🔍 VerifyToken: decoded payload:', JSON.stringify(result.decoded, null, 2));
-    console.log('🔍 VerifyToken: decoded type:', typeof result.decoded);
-    console.log('🔍 VerifyToken: decoded is null?', result.decoded === null);
-    console.log('🔍 VerifyToken: decoded is undefined?', result.decoded === undefined);
-    
-    console.log('🔍 VerifyToken: calling TokenClass.FromDecodedInfo...');
     let token_ = TokenClass.FromDecodedInfo(result.decoded);
-    console.log('🔍 VerifyToken: result from TokenClass.FromDecodedInfo:', token_);
     
     if (!token_) {
-        console.log('❌ VerifyToken: invalid token structure:', result.decoded);
-        console.log('❌ VerifyToken: decoded.id exists?', result.decoded ? result.decoded.id : 'decoded is null/undefined');
-        console.log('❌ VerifyToken: decoded.token_type exists?', result.decoded ? result.decoded.token_type : 'decoded is null/undefined');
+        console.error('❌ VerifyToken: Invalid token structure');
         return res.status(401).json({ error: 'Invalid token' });
     }
-    
-    console.log('✅ VerifyToken: token successfully parsed:', {
-        id: token_.id,
-        token_type: token_.token_type
-    });
 
     req.token_id = token_.id;
     req.token_type = token_.token_type;
-    console.log('✅ VerifyToken: token verified and attached to request');
     next();
 }
 

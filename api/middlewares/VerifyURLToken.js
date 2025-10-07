@@ -28,7 +28,7 @@ const VerifyURLToken = async (req, res, next) => {
         console.log('VerifyURLToken: invalid token: ', result.decoded);
         return res.status(401).json({ error: 'Invalid token' });
     }
-    console.log('VerifyURLToken: decoded info: ', token_);
+    // Token structure validated successfully
 
     req.token_id = token_.id;
     req.token_type = token_.token_type;

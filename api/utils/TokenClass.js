@@ -11,31 +11,15 @@ class TokenClass {
     }
 
     static FromDecodedInfo(decoded) {
-        console.log('🔍 TokenClass: FromDecodedInfo called');
-        console.log('🔍 TokenClass: decoded parameter:', JSON.stringify(decoded, null, 2));
-        console.log('🔍 TokenClass: decoded type:', typeof decoded);
-        console.log('🔍 TokenClass: decoded is null?', decoded === null);
-        console.log('🔍 TokenClass: decoded is undefined?', decoded === undefined);
-        
         if (!decoded) {
-            console.log('❌ TokenClass: decoded is null or undefined');
             return null;
         }
-        
-        console.log('🔍 TokenClass: decoded.id:', decoded.id);
-        console.log('🔍 TokenClass: decoded.token_type:', decoded.token_type);
-        console.log('🔍 TokenClass: decoded.id type:', typeof decoded.id);
-        console.log('🔍 TokenClass: decoded.token_type type:', typeof decoded.token_type);
         
         if (!decoded.id || !decoded.token_type) {
-            console.log('❌ TokenClass: missing required fields (id or token_type)');
             return null;
         }
         
-        console.log('✅ TokenClass: creating new TokenClass instance');
-        const tokenInstance = new TokenClass(decoded.id, decoded.token_type);
-        console.log('✅ TokenClass: created instance:', tokenInstance);
-        return tokenInstance;
+        return new TokenClass(decoded.id, decoded.token_type);
     }
 
     toToken() {
