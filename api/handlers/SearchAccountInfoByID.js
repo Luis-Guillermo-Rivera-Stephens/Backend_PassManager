@@ -48,9 +48,14 @@ const SearchAccountInfoByID = async (req, res) => {
     account.started = undefined;
 
 
-    const passwords = result_passwords.data;
+    let passwords = result_passwords.data;
+    let total = result_passwords.total > limit ? limit : result_passwords.total;
+    let next_page = result_passwords.total > limit ? page + 1 : null;
+    if (result_passwords.total > limit) {
+        passwords = passwords.slice(0, limit);
+    }
 
-    return res.status(200).json({ data: {account: account, passwords: passwords}, total: result_passwords.total, message: 'Account info fetched successfully', next_page: result_passwords.total > (page * limit) ? page + 1 : null, current_page: page });
+    return res.status(200).json({ data: {account: account, passwords: passwords}, total: total, message: 'Account info fetched successfully', next_page: next_page, current_page: page });
 }
 
 module.exports = SearchAccountInfoByID;

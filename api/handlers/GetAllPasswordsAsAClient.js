@@ -32,9 +32,9 @@ const GetAllPasswordsAsAClient = async (req, res) => {
         return res.status(404).json({ error: 'No passwords found' });
     }
 
-    let total = result.total == 11 ? 10 : result.total;
-    let next_page = result.total == 11 ? page + 1 : null;
-    if (result.total == 11) {
+    let total = result.total > limit ? limit : result.total;
+    let next_page = result.total > limit ? page + 1 : null;
+    if (result.total > limit) {
         result.data = result.data.slice(0, limit);
     }
     return res.status(200).json({ data: result.data, total: total, message: 'Passwords fetched successfully', next_page: next_page, current_page: page });
