@@ -3,6 +3,8 @@
 node_modules
 .vscode
 
+*.sh
+
 # Certificados SSL - NO subir a repositorio por seguridad
 **/certificates
 
