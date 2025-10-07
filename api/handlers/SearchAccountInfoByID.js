@@ -11,7 +11,7 @@ const SearchAccountInfoByID = async (req, res) => {
     page = page ? parseInt(page) : 1;
     search = search ? search : '';
     search = search.trim();
-    const limit = 10;
+    const limit = 5;
 
     let db = null;
 

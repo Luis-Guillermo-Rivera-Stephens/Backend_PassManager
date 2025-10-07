@@ -7,7 +7,7 @@ const GetAllPasswordsAsAClient = async (req, res) => {
     const { id } = req.account;
     let { page, search } = req.query;
     page = page ? parseInt(page) : 1;
-    const limit = 10;
+    const limit = 5;
 
     search = search ? search : '';
     search = search.trim();
