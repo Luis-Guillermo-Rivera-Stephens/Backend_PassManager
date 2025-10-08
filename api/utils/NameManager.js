@@ -2,6 +2,9 @@ const AvaliableName = require('../queries/AvaliableName');
 
 class NameManager {
     static ValidateName(name) {
+        if (!name) {
+            return false;
+        }
         const regex = /^[a-zA-Z\s@._-]+$/;
         return regex.test(name);
     }
