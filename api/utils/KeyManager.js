@@ -16,8 +16,8 @@ class KeyManager {
 
     static GetKey(email, salt) {
         // 1️⃣ Generamos una semilla determinista a partir de la salt y las cadenas
-        const str1 = email;
-        const str2 = AES_KEY;
+        const str1 = AES_KEY;
+        const str2 = email;
         
         const hash = crypto.createHash("sha256")
             .update(str1 + str2 + salt)

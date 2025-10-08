@@ -24,7 +24,7 @@ const AccountExistByID = async (req, res, next) => {
         return res.status(400).json({ error: 'Account does not exist' });
     }
     console.log('AccountExistByID: account exists');
-    result.account = new Account(result.account.id, result.account.name, result.account.email, result.account.password, result.account.createdAt, result.account.started, result.account.verified, result.account.type, result.account.twofaenabled);
+    result.account = new Account(result.account.id, result.account.name, result.account.email, result.account.password, result.account.createdAt, result.account.started, result.account.verified, result.account.type, result.account.twofaenabled, result.account.salt);
     req.account = result.account;
     console.log('AccountExistByID: account exists');
     next();
