@@ -1,8 +1,9 @@
 const AuthManager = require('../utils/AuthManager');
 const { connectDB } = require('../data/connectDB');
+const KeyManager = require('../utils/KeyManager');
 
 const TwoFASetup = async (req, res) => {
-    const { id: account_id, twofaenabled } = req.account;
+    const { id: account_id, twofaenabled, email, salt } = req.account;
 
     if (twofaenabled) {
         return res.status(400).json({ error: 'TwoFA already enabled' });
@@ -21,8 +22,9 @@ const TwoFASetup = async (req, res) => {
     let encryptedSecret = null;
     
     try {
-        encryptedSecret = AuthManager.EncryptSecret(secret);
-        qrCode = await AuthManager.GenerateQRCode(req.account.email, secret);
+        let key = KeyManager.GetKey(email, salt);
+        encryptedSecret = AuthManager.EncryptSecret(secret, key);
+        qrCode = await AuthManager.GenerateQRCode(email, secret);
         const result = await AuthManager.TwoFASetup(account_id, encryptedSecret, db);
         if (!result.success) {
             console.log('TwoFASetup: error', result.error);

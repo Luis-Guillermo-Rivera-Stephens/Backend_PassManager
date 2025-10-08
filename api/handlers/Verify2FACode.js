@@ -2,10 +2,11 @@ const AuthManager = require('../utils/AuthManager');
 const { connectDB } = require('../data/connectDB');
 const TokenClass = require('../utils/TokenClass');
 const AttemptsManager = require('../utils/AttemptsManager');
+const KeyManager = require('../utils/KeyManager');
 
 const Verify2FACode = async (req, res) => {
     const { code } = req.body;
-    const { id: account_id } = req.account;
+    const { id: account_id, email, salt } = req.account;
 
 
     if (!AttemptsManager.validateNewAttempt(account_id)) {
@@ -23,7 +24,8 @@ const Verify2FACode = async (req, res) => {
         console.log('Verify2FACode: error', error);
         return res.status(500).json({ error: 'Internal server error' });
     }
-    const result_secret = await AuthManager.SecretGetter(account_id, db);
+    let key = KeyManager.GetKey(email, salt);
+    const result_secret = await AuthManager.SecretGetter(account_id, db, key);
     if (!result_secret.success) {
         console.log('Verify2FACode: error', result_secret.error);
         return res.status(500).json({ error: result_secret.error });

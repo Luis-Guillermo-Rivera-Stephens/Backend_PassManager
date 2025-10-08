@@ -5,7 +5,6 @@ const { DateTime } = require('luxon');
 const TwoFASetup = require('../queries/2FASetup');
 const SecretGetter = require('../queries/SecretGetter');
 
-const AES_KEY = process.env.AES_KEY;
 const ISSUER = process.env.TOTP_ISSUER || 'ReservAI PassManager'; // nombre que verán los usuarios en el autenticador
 
 // Configuración específica para TOTP (usar UTC estándar)
@@ -21,12 +20,12 @@ authenticator.options = {
 
 class AuthManager {
     // ========= AES para manejar secretos =========
-    static EncryptSecret(secret) {
-        return CryptoJS.AES.encrypt(secret, AES_KEY).toString();
+    static EncryptSecret(secret, key) {
+        return CryptoJS.AES.encrypt(secret, key).toString();
     }
 
-    static DecryptSecret(secretEnc) {
-        return CryptoJS.AES.decrypt(secretEnc, AES_KEY).toString(CryptoJS.enc.Utf8);
+    static DecryptSecret(secretEnc, key) {
+        return CryptoJS.AES.decrypt(secretEnc, key).toString(CryptoJS.enc.Utf8);
     }
 
     static GenerateSecret() {
@@ -102,14 +101,14 @@ class AuthManager {
         }
     }
     
-    static async SecretGetter(account_id, db) {
+    static async SecretGetter(account_id, db, key) {
         try {
             const result = await db.query(SecretGetter, [account_id]);
             let secret = result.rows[0].secret;
             if (!secret) {
                 return { success: false, error: 'Secret not found' };
             }
-            secret = this.DecryptSecret(secret);
+            secret = this.DecryptSecret(secret, key);
             return { success: true, secret: secret };
         } catch (error) {
             return { success: false, error: error.message };

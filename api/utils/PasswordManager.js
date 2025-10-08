@@ -48,12 +48,14 @@ class PasswordManager {
         return await bcrypt.compare(password, hashedPassword);
     }
 
-    static HidePassword(password) {
-        return CryptoJS.AES.encrypt(password, AES_KEY).toString();
+    
+    
+    static HidePassword(password, key) {
+        return CryptoJS.AES.encrypt(password, key).toString();
     }
 
-    static ShowPassword(password) {
-        return CryptoJS.AES.decrypt(password, AES_KEY).toString(CryptoJS.enc.Utf8);
+    static ShowPassword(password, key) {
+        return CryptoJS.AES.decrypt(password, key).toString(CryptoJS.enc.Utf8);
     } 
 
 
@@ -166,17 +168,6 @@ class PasswordManager {
             }
         }
         value = this.SanitizeValue(value);
-
-        if (attribute === 'password') {
-            try {
-                value = this.HidePassword(value);
-            } catch (error) {
-                return {
-                    error: 'Invalid password',
-                    success: false
-                }
-            }
-        }
 
         try {
             const result = await db.query(query, [value, pass_id, account_id]);

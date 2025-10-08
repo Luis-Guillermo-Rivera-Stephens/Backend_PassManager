@@ -1,6 +1,7 @@
 const PasswordManager = require('../utils/PasswordManager');
 const { connectDB } = require('../data/connectDB');
 const { Password } = require('../models/password');
+const KeyManager = require('../utils/KeyManager');
 
 const CreatePasswordInAnotherAccount = async (req, res) => {
     console.log('CreatePasswordInAnotherAccount: starting...');
@@ -10,6 +11,14 @@ const CreatePasswordInAnotherAccount = async (req, res) => {
         console.log('CreatePasswordInAnotherAccount: account is an admin');
         return res.status(403).json({ error: 'Account is an admin, you cannot create a password in another admin account' });
     }
+    
+    let result_key_info = await KeyManager.GetKeyInfoByID(account_id, db);
+    if (result_key_info.error) {
+        console.log('CreatePasswordInAnotherAccount: error', result_key_info.error);
+        return res.status(500).json({ error: result_key_info.error });
+    }
+    let { salt, email } = result_key_info;
+
     let { name, description, password, updateablebyclient, visibility } = req.body;
     description = description || '';
     updateablebyclient = updateablebyclient || true;
@@ -34,7 +43,17 @@ const CreatePasswordInAnotherAccount = async (req, res) => {
         return res.status(400).json({ error: 'Invalid password' });
     }
     password = PasswordManager.SanitizePassword(password);
-    password = PasswordManager.HidePassword(password);
+
+
+    let key = null;
+    try {
+        key = await KeyManager.GetKey(email, salt);
+    } catch (error) {
+        console.log('CreatePasswordInAnotherAccount: error', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+
+    password = PasswordManager.HidePassword(password, key);
 
     const instance = Password.newPasswordAsAnAdmin(name, description, password, updateablebyclient, visibility, account_id);
 
