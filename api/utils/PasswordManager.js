@@ -135,7 +135,7 @@ class PasswordManager {
         switch (attribute) {
             case 'name':
                 flag = this.ValidatePasswordName(value);
-                query = `UPDATE passwords SET name = $1 WHERE id = $2 AND account_id = $3 AND key = $4`;
+                query = `UPDATE passwords SET name = $1 WHERE id = $2 AND account_id = $3`;
                 break;
             case 'description':
                 flag = this.ValidateDescription(value);
@@ -168,7 +168,7 @@ class PasswordManager {
         value = this.SanitizeValue(value);
 
         try {
-            const result = await db.query(query, [value, pass_id, account_id, key]);
+            const result = await db.query(query, [value, pass_id, account_id]);
             return {
                 success: true,
                 data: result.rows[0],

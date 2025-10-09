@@ -9,7 +9,6 @@ class AccountManager {
     static async accountExistsByEmail(email, db) {
         try {
             const result = await db.query(AccountExistsByEmail, [email]);
-            console.log('AccountManager: accountExistsByEmail: result', result.rows[0]);
             return {
                 success: true,
                 account: result.rows[0],
@@ -26,7 +25,6 @@ class AccountManager {
     static async accountExistsByID(id, db) {
         try {
             const result = await db.query(AccountExistsById, [id]);
-            console.log('AccountManager: accountExistsByID: result', result.rows[0]	);
             return {
                 success: true,
                 account: result.rows[0],
