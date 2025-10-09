@@ -47,8 +47,6 @@ class PasswordManager {
     static async ComparePassword(password, hashedPassword) {
         return await bcrypt.compare(password, hashedPassword);
     }
-
-    
     
     static HidePassword(password, key) {
         return CryptoJS.AES.encrypt(password, key).toString();
@@ -137,14 +135,14 @@ class PasswordManager {
         switch (attribute) {
             case 'name':
                 flag = this.ValidatePasswordName(value);
-                query = `UPDATE passwords SET name = $1 WHERE id = $2 AND account_id = $3`;
+                query = `UPDATE passwords SET name = $1 WHERE id = $2 AND account_id = $3 AND key = $4`;
                 break;
             case 'description':
                 flag = this.ValidateDescription(value);
                 query = `UPDATE passwords SET description = $1 WHERE id = $2 AND account_id = $3`;
                 break;
             case 'password':
-                flag = this.ValidatePasswordValue(value);
+                flag = true;
                 query = `UPDATE passwords SET password = $1 WHERE id = $2 AND account_id = $3`;
                 break;
             case 'updateablebyclient':
@@ -170,7 +168,7 @@ class PasswordManager {
         value = this.SanitizeValue(value);
 
         try {
-            const result = await db.query(query, [value, pass_id, account_id]);
+            const result = await db.query(query, [value, pass_id, account_id, key]);
             return {
                 success: true,
                 data: result.rows[0],
