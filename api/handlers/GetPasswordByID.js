@@ -11,6 +11,16 @@ const GetPasswordByID = async (req, res) => {
     let salt = null;
     let credentials = false;
 
+    
+    let db = null;
+    try {
+        db = await connectDB();
+    }
+    catch (error) {
+        console.log('GetPasswordById: error', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+    
     if (req.originalUrl.includes('/a/')) {
         account_id = req.account_id_url.id;
         let result_key_info = await KeyManager.GetKeyInfoByID(account_id, db);
@@ -28,16 +38,7 @@ const GetPasswordByID = async (req, res) => {
         salt = req.account.salt;
         credentials = false;
     }
-
-    let db = null;
-    try {
-        db = await connectDB();
-    }
-    catch (error) {
-        console.log('GetPasswordById: error', error);
-        return res.status(500).json({ error: 'Internal server error' });
-    }
-
+    
     var result = await PasswordGetter.GetPasswordById(pass_id, account_id, db, credentials );
     if (result.error) {
         console.log('GetPasswordById: error', result.error);
