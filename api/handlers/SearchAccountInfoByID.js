@@ -34,7 +34,7 @@ const SearchAccountInfoByID = async (req, res) => {
     }
 
     const credentials = req.account.type === 'admin';
-    const result_passwords = await PasswordGetter.GetAllPasswords(account_id, credentials, offset, limit, db, search);
+    const result_passwords = await PasswordGetter.GetAllPasswords(account_id, credentials, offset, limit + 1, db, search);
     if (result_passwords.error) {
         console.log('SearchAccountInfoByID: error', result_passwords.error);
         return res.status(500).json({ error: result_passwords.error });
