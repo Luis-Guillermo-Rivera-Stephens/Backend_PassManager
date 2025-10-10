@@ -29,14 +29,15 @@ const UpdateAsAnAdmin = async (req, res) => {
             return res.status(400).json({ error: 'Invalid password' });
         }
         value = PasswordManager.SanitizePassword(value);
-        
-        const result_key_info = KeyManager.GetKeyInfoByID(account_id_url, db);
+
+        const result_key_info = await KeyManager.GetKeyInfoByID(account_id_url, db);
         if (result_key_info.error) {
             console.log('UpdateAsAnAdmin: error', result_key_info.error);
             return res.status(500).json({ error: result_key_info.error });
         }
-        let { salt, email } = result_key_info;
-        key = KeyManager.GetKey(email, salt);
+        let email = result_key_info.email;
+        let salt = result_key_info.salt;
+        let key = KeyManager.GetKey(email, salt);
         if (!key) {
             console.log('UpdateAsAnAdmin: error', error);
             return res.status(500).json({ error: 'Internal server error' });
