@@ -4,7 +4,13 @@ const { connectDB } = require('../data/connectDB');
 const DeletePassword = async (req, res) => {
     console.log('DeletePassword: starting...');
     const { pass_id } = req.params;
-    const { id: account_id } = req.account || req.account_id_url;
+    const { id: account_id } =  req.account_id_url || req.account;
+
+    if (!validate(pass_id)) {
+        console.log('DeletePassword: invalid UUID');
+        return res.status(400).json({ error: 'Invalid UUID' });
+    }
+    
     let db = null;
     try {
         db = await connectDB();
