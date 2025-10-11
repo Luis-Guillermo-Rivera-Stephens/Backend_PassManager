@@ -1,5 +1,6 @@
 const PasswordManager = require('../utils/PasswordManager');
 const { connectDB } = require('../data/connectDB');
+const { validate } = require('uuid');
 
 const DeletePassword = async (req, res) => {
     console.log('DeletePassword: starting...');
@@ -10,7 +11,7 @@ const DeletePassword = async (req, res) => {
         console.log('DeletePassword: invalid UUID');
         return res.status(400).json({ error: 'Invalid UUID' });
     }
-    
+
     let db = null;
     try {
         db = await connectDB();
