@@ -7,7 +7,7 @@ const VerifyURLToken = async (req, res, next) => {
     const token = req.params.token;
     if (!token || typeof token !== 'string') {
         console.log('VerifyURLToken: token is required');
-        return res.status(401).json({ error: 'Token is required' });
+        return res.status(418).json({ error: 'Token is required' });
     }
 
     let token_id = ApiKeyManager.VerifyApiKey(token);
@@ -21,12 +21,12 @@ const VerifyURLToken = async (req, res, next) => {
     const result = TokenManager.VerifyToken(token);
     if (result.error) {
         console.log('VerifyURLToken: error verifying token: ', result.error);
-        return res.status(401).json({ error: result.error });
+        return res.status(418).json({ error: result.error });
     }
     let token_ = TokenClass.FromDecodedInfo(result.decoded);
     if (!token_) {
         console.log('VerifyURLToken: invalid token: ', result.decoded);
-        return res.status(401).json({ error: 'Invalid token' });
+        return res.status(418).json({ error: 'Invalid token' });
     }
     // Token structure validated successfully
 
