@@ -12,13 +12,7 @@ const CreatePasswordInAnotherAccount = async (req, res) => {
         return res.status(403).json({ error: 'Account is an admin, you cannot create a password in another admin account' });
     }
     
-    let result_key_info = await KeyManager.GetKeyInfoByID(account_id, db);
-    if (result_key_info.error) {
-        console.log('CreatePasswordInAnotherAccount: error', result_key_info.error);
-        return res.status(500).json({ error: result_key_info.error });
-    }
-    let { salt, email } = result_key_info;
-
+    
     let { name, description, password, updateablebyclient, visibility } = req.body;
     description = description || '';
     updateablebyclient = updateablebyclient || true;
@@ -29,7 +23,7 @@ const CreatePasswordInAnotherAccount = async (req, res) => {
         console.log('CreatePasswordInAnotherAccount: invalid name, password or account_id');
         return res.status(400).json({ error: 'Invalid name, password or account_id' });
     }
-
+    
     let db = null;
     try {
         db = await connectDB();
@@ -38,6 +32,15 @@ const CreatePasswordInAnotherAccount = async (req, res) => {
         return res.status(500).json({ error: 'Internal server error' });
     }
 
+    let result_key_info = await KeyManager.GetKeyInfoByID(account_id, db);
+    if (result_key_info.error) {
+        console.log('CreatePasswordInAnotherAccount: error', result_key_info.error);
+        return res.status(500).json({ error: result_key_info.error });
+    }
+    let salt = result_key_info.salt;
+    let email = result_key_info.email;
+
+    
     if (!PasswordManager.ValidatePasswordValue(password)) {
         console.log('CreatePasswordInAnotherAccount: invalid password');
         return res.status(400).json({ error: 'Invalid password' });
